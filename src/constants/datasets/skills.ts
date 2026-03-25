@@ -1,4 +1,4 @@
-// Generated on 2026-02-28T16:34:17.506Z
+// Generated on 2026-03-14T11:09:04.689Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const skills = [
@@ -3599,7 +3599,7 @@ export const skills = [
   {
     id: '614',
     label: 'Στρατηγική Marketing',
-    slug: '-marketing',
+    slug: 'stratigiki-marketing',
     category: 'Z0YeWT',
   },
   {
@@ -3613,5 +3613,17 @@ export const skills = [
     label: 'Soundcloud',
     slug: 'soundcloud',
     category: 'q20QDs',
+  },
+  {
+    id: '1317',
+    label: 'Saas',
+    slug: 'saas',
+    category: 'xWJj-V',
+  },
+  {
+    id: '1318',
+    label: 'Καθαρισμοί οικοπέδων',
+    slug: 'katharismoi-oikopedon',
+    category: '9JIHhR',
   },
 ];

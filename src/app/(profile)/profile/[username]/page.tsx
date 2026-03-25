@@ -9,7 +9,6 @@ import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import {
   ProfileBio,
   ProfileFeatures,
-  ProfileIndustries,
   ProfileInfo,
   ProfileMeta,
   ProfileMetrics,
@@ -103,7 +102,6 @@ export default async function ProfilePage({
     settlementMethodsData,
     budgetData,
     sizeData,
-    industriesData,
     coverage,
     visibility,
     socials,
@@ -139,7 +137,7 @@ export default async function ProfilePage({
       {/* Breadcrumb Navigation */}
       <DynamicBreadcrumb
         segments={breadcrumbSegments}
-        buttons={breadcrumbButtons}
+        buttons={{ ...breadcrumbButtons, isOwner: currentUserId === profile.uid }}
       />
       {/* Profile Content */}
       <section className='pt-4 pb-20 bg-white'>
@@ -161,13 +159,13 @@ export default async function ProfilePage({
                 coverage={coverage}
                 visibility={visibility}
                 socials={socials}
+                subcategory={subcategory}
               />
 
               {/* Profile Metrics */}
               <ProfileMetrics
-                category={category}
-                subcategory={subcategory}
                 serviceSubdivisions={result.data.serviceSubdivisionsData}
+                coverage={coverage}
               />
               <ProfileBio bio={profile.bio} />
               <ProfileFeatures
@@ -210,9 +208,6 @@ export default async function ProfilePage({
                 </div>
               </div>
 
-              <ProfileIndustries
-                industries={industriesData.map((industry) => industry.label)}
-              />
               <ProfilePortfolio portfolio={profile.portfolio} />
 
               {/* Profile Services */}

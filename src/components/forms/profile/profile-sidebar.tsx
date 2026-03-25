@@ -8,8 +8,6 @@ import {
   Info,
   Presentation,
   Shield,
-  Building,
-  Receipt,
   UserCircle,
   Globe,
 } from 'lucide-react';
@@ -47,11 +45,6 @@ const profileMenuItems = [
     title: 'Πιστοποίηση',
     url: '/dashboard/profile/verification',
     icon: Shield,
-  },
-  {
-    title: 'Στοιχεία Τιμολόγησης',
-    url: '/dashboard/profile/billing',
-    icon: Building,
   },
 ];
 

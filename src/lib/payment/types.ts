@@ -46,6 +46,8 @@ export interface CheckoutSessionParams {
   cancelUrl: string;
   /** Optional billing details to prefill checkout */
   billing?: CheckoutBillingDetails;
+  /** Optional coupon code for discount */
+  couponCode?: string;
 }
 
 /**

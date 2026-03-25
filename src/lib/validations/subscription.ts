@@ -29,6 +29,8 @@ export const createCheckoutSessionSchema = z.object({
   plan: subscriptionPlanSchema.default(SubscriptionPlan.promoted),
   // Billing interval (monthly or yearly)
   billingInterval: billingIntervalSchema,
+  // Optional coupon code for discount
+  couponCode: z.string().optional(),
 });
 
 /**

@@ -1,4 +1,4 @@
-// Generated on 2026-03-06T13:21:19.258Z
+// Generated on 2026-03-20T17:26:44.305Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -248,6 +248,25 @@ export const serviceTaxonomies = [
               bytes: 59546,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168114/97_eefe62f42a.webp',
               original_filename: '97.webp',
+            },
+          },
+          {
+            id: 'Q8VeiC',
+            label: 'UGC Video',
+            slug: 'ugc-video',
+            description:
+              'Δημιουργία μοναδικού περιεχομένου βίντεο UGC από πραγματικούς χρήστες που θα δοκιμάσουν τα προϊόντα σου.',
+            image: {
+              public_id: '267_a22f361b2f',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 112077,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
+              original_filename: '267.webp',
             },
           },
         ],
@@ -2213,25 +2232,6 @@ export const serviceTaxonomies = [
             },
           },
           {
-            id: 'ui0geF',
-            label: 'Θεραπείες',
-            slug: 'therapeies',
-            description:
-              'Ανακάλυψε θεραπείες που αναζωογονούν το σώμα και το πνεύμα σου, προσφέροντας ευεξία και φροντίδα.',
-            image: {
-              public_id: '182_e077508f61',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 28232,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
-              original_filename: '182.webp',
-            },
-          },
-          {
             id: 'VYbWqa',
             label: 'Θεραπείες Δέρματος',
             slug: 'therapeies-dermatos',
@@ -3088,6 +3088,25 @@ export const serviceTaxonomies = [
               format: 'webp',
               bytes: 40492,
               url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
+            },
+          },
+          {
+            id: 'ui0geF',
+            label: 'Θεραπείες',
+            slug: 'therapeies',
+            description:
+              'Ανακάλυψε θεραπείες που αναζωογονούν το σώμα και το πνεύμα σου, προσφέροντας ευεξία και φροντίδα.',
+            image: {
+              public_id: '182_e077508f61',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 28232,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
+              original_filename: '182.webp',
             },
           },
         ],
@@ -4357,15 +4376,15 @@ export const serviceTaxonomies = [
         description:
           'Αύξησε την online παρουσία σου με στρατηγικές digital marketing που προσελκύουν και αυξάνουν τους πελάτες.',
         image: {
-          public_id: 'digital_marketing_ipiresies_c36961f97a',
+          public_id: 'subcategories/digital-marketing_lffcpk',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728402147/digital_marketing_ipiresies_c36961f97a.png',
-          width: 532,
-          height: 300,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1773940088/subcategories/digital-marketing_lffcpk.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
-          format: 'png',
-          bytes: 39890,
-          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728402147/digital_marketing_ipiresies_c36961f97a.png',
+          format: 'webp',
+          bytes: 35254,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1773940088/subcategories/digital-marketing_lffcpk.webp',
         },
         children: [
           {
@@ -4404,25 +4423,6 @@ export const serviceTaxonomies = [
               bytes: 53545,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168513/277_f1a8078bb6.webp',
               original_filename: '277.webp',
-            },
-          },
-          {
-            id: 'gAn97n',
-            label: 'Influencer Marketing',
-            slug: 'influencer-marketing',
-            description:
-              'Ανακάλυψε πώς να προωθήσεις το brand σου μέσω επιδραστικών προσωπικοτήτων στα social media.',
-            image: {
-              public_id: '265_994bfdc477',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 41697,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
-              original_filename: '265.webp',
             },
           },
           {
@@ -4483,25 +4483,6 @@ export const serviceTaxonomies = [
             },
           },
           {
-            id: 'Q8VeiC',
-            label: 'Social Media',
-            slug: 'social-media',
-            description:
-              'Ανακάλυψε πώς να ενισχύσεις την παρουσία σου στα social media με στρατηγικές που αποδίδουν.',
-            image: {
-              public_id: '267_a22f361b2f',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 112077,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
-              original_filename: '267.webp',
-            },
-          },
-          {
             id: '8Da26i',
             label: 'Βελτιστοποίηση SEO',
             slug: 'veltistopoiisi-seo',
@@ -4518,25 +4499,6 @@ export const serviceTaxonomies = [
               bytes: 81480,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/282_ea33b2e0ac.webp',
               original_filename: '282.webp',
-            },
-          },
-          {
-            id: '0syncL',
-            label: 'Δημιουργία Αναρτήσεων Social Media',
-            slug: 'dimiourgia-anartiseon-social-media',
-            description:
-              'Δημιούργησε εντυπωσιακές αναρτήσεις για τα social media σου και ενίσχυσε την ψηφιακή σου παρουσία.',
-            image: {
-              public_id: '261_92e7f98568',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 85074,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
-              original_filename: '261.webp',
             },
           },
           {
@@ -4654,25 +4616,6 @@ export const serviceTaxonomies = [
             },
           },
           {
-            id: '6CgzmM',
-            label: 'Διαφημίσεις Social Media',
-            slug: 'diafimiseis-social-media',
-            description:
-              'Αύξησε την απήχηση της επιχείρησής σου με στοχευμένες διαφημίσεις στα social media.',
-            image: {
-              public_id: '276_82d5310e5e',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 111913,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
-              original_filename: '276.webp',
-            },
-          },
-          {
             id: 'NEpFgX',
             label: 'Διαφημίσεις TIkTok',
             slug: 'diafimiseis-tiktok',
@@ -4689,25 +4632,6 @@ export const serviceTaxonomies = [
               bytes: 53361,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168514/274_9b4524fce6.webp',
               original_filename: '274.webp',
-            },
-          },
-          {
-            id: 'UInpMs',
-            label: 'Διαχείριση Social Media',
-            slug: 'diaxeirisi-social-media',
-            description:
-              'Ανάπτυξε την παρουσία σου στα social media με στρατηγική διαχείριση και αύξησε την αλληλεπίδραση.',
-            image: {
-              public_id: '275_c2608a26f6',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 103803,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
-              original_filename: '275.webp',
             },
           },
           {
@@ -5249,6 +5173,102 @@ export const serviceTaxonomies = [
               bytes: 41851,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/296_c49fce8364.webp',
               original_filename: '296.webp',
+            },
+          },
+        ],
+      },
+      {
+        id: 'q5F8Ns',
+        label: 'Social Media',
+        slug: 'social-media',
+        description:
+          'Ανακάλυψε πώς θα ενισχύσεις την παρουσία σου στα social media με στρατηγικές που αποδίδουν.',
+        image: {
+          public_id: 'subcategories/social-media_w1nght',
+          secure_url:
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1773939989/subcategories/social-media_w1nght.webp',
+          width: 1200,
+          height: 675,
+          resource_type: 'image',
+          format: 'webp',
+          bytes: 24938,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1773939989/subcategories/social-media_w1nght.webp',
+        },
+        children: [
+          {
+            id: 'gAn97n',
+            label: 'Influencer Marketing',
+            slug: 'influencer-marketing',
+            description:
+              'Ανακάλυψε πώς να προωθήσεις το brand σου μέσω επιδραστικών προσωπικοτήτων στα social media.',
+            image: {
+              public_id: '265_994bfdc477',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 41697,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
+              original_filename: '265.webp',
+            },
+          },
+          {
+            id: '0syncL',
+            label: 'Δημιουργία Αναρτήσεων Social Media',
+            slug: 'dimiourgia-anartiseon-social-media',
+            description:
+              'Δημιούργησε εντυπωσιακές αναρτήσεις για τα social media σου και ενίσχυσε την ψηφιακή σου παρουσία.',
+            image: {
+              public_id: '261_92e7f98568',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 85074,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
+              original_filename: '261.webp',
+            },
+          },
+          {
+            id: '6CgzmM',
+            label: 'Διαφημίσεις Social Media',
+            slug: 'diafimiseis-social-media',
+            description:
+              'Αύξησε την απήχηση της επιχείρησής σου με στοχευμένες διαφημίσεις στα social media.',
+            image: {
+              public_id: '276_82d5310e5e',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 111913,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
+              original_filename: '276.webp',
+            },
+          },
+          {
+            id: 'UInpMs',
+            label: 'Διαχείριση Social Media',
+            slug: 'diaxeirisi-social-media',
+            description:
+              'Ανάπτυξε την παρουσία σου στα social media με στρατηγική διαχείριση και αύξησε την αλληλεπίδραση.',
+            image: {
+              public_id: '275_c2608a26f6',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 103803,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
+              original_filename: '275.webp',
             },
           },
         ],

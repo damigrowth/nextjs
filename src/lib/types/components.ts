@@ -180,6 +180,7 @@ export interface ProfileMetaProps {
   coverage?: PrismaJson.Coverage;
   visibility?: PrismaJson.VisibilitySettings;
   socials?: PrismaJson.SocialMedia;
+  subcategory?: DatasetItem;
 }
 
 export interface MetricCardProps {
@@ -194,6 +195,7 @@ export interface ProfileMetricsProps {
   category?: DatasetItem;
   subcategory?: DatasetItem;
   serviceSubdivisions?: DatasetItem[];
+  coverage?: PrismaJson.Coverage;
 }
 
 export interface ProfileRatingProps {
@@ -215,12 +217,10 @@ export interface ProfileFeaturesProps {
   settlementMethods?: string[];
   size?: string;
   budget?: string;
-  industries?: string[];
   // Resolved data from taxonomies
   contactMethodsData?: DatasetItem[];
   paymentMethodsData?: DatasetItem[];
   settlementMethodsData?: DatasetItem[];
-  industriesData?: DatasetItem[];
 }
 
 export interface TaxonomyTab {
@@ -245,6 +245,7 @@ export interface BreadcrumbButtonsProps {
   subjectTitle: string;
   id: string | number;
   saveType?: string;
+  isOwner?: boolean;
 }
 
 export type ProfileBreadcrumbProfileData = {
@@ -274,9 +275,11 @@ export type ServiceCardData = Pick<
   media: PrismaJson.Media;
   profile: Pick<
     import('@prisma/client').Profile,
-    'id' | 'username' | 'displayName' | 'image'
+    'id' | 'uid' | 'username' | 'displayName' | 'image'
   > & {
     portfolio?: PrismaJson.Portfolio | null;
+    coverage?: PrismaJson.Coverage | null;
+    groupedCoverage?: Array<{ county: string; areas: string[] }>;
   };
 };
 
@@ -298,7 +301,6 @@ export type ProfileCardData = Pick<
 
 export interface ProfileCardProps {
   profile: ProfileCardData;
-  isSaved?: boolean;
 }
 
 // Archive Component Types for Archives Feature
@@ -307,6 +309,7 @@ export interface ProfileCardProps {
 export type ArchiveProfileCardData = Pick<
   import('@prisma/client').Profile,
   | 'id'
+  | 'uid'
   | 'username'
   | 'displayName'
   | 'rating'
@@ -357,6 +360,7 @@ export type ArchiveServiceCardData = Pick<
   profile: Pick<
     import('@prisma/client').Profile,
     | 'id'
+    | 'uid'
     | 'displayName'
     | 'username'
     | 'image'

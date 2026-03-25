@@ -1,42 +1,41 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 import SaveButton from './save-button';
+import TaxonomiesDisplay from './taxonomies-display';
 import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
 import NextLink from './next-link';
 import RatingDisplay from './rating-display';
 import { MediaTypeIndicators } from './media-type-indicators';
+import { CoverageDisplay } from '@/components/archives/coverage-display';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface ServiceCardProps {
   service: ServiceCardData;
   showProfile?: boolean;
   hideDisplayName?: boolean;
-  isSaved?: boolean;
 }
 
 export default function ServiceCard({
   service,
   showProfile = true,
   hideDisplayName = false,
-  isSaved = false,
 }: ServiceCardProps) {
   // Convert price to number for reliable comparison
   const priceValue = Number(service?.price) || 0;
   const hasValidPrice = priceValue > 0;
 
-  // Build category badge label: "subcategory - subdivision" or just "subcategory/category"
-  const primaryLabel =
-    service.taxonomyLabels?.subcategory ||
-    service.taxonomyLabels?.category ||
-    service.category;
-  const subdivisionLabel = service.taxonomyLabels?.subdivision;
-  const badgeLabel =
-    primaryLabel && subdivisionLabel
-      ? `${primaryLabel} - ${subdivisionLabel}`
-      : primaryLabel;
+  // Build taxonomy labels for badge display
+  const badgeTaxonomyLabels = {
+    category: '',
+    subcategory:
+      service.taxonomyLabels?.subcategory ||
+      service.taxonomyLabels?.category ||
+      service.category ||
+      '',
+    subdivision: service.taxonomyLabels?.subdivision || '',
+  };
 
   // Get optimized background image URL for profile section
   const optimizedBgImage = service.profile.image
@@ -50,7 +49,7 @@ export default function ServiceCard({
         <SaveButton
           itemType='service'
           itemId={service.id}
-          initialSaved={isSaved}
+          ownerId={service.profile.uid}
         />
       </div>
 
@@ -84,19 +83,18 @@ export default function ServiceCard({
       {/* Content Section */}
       <NextLink href={`/s/${service.slug}`} className='block flex-1'>
         <CardContent className='p-4 flex flex-col h-full'>
-          {/* Category */}
-          {badgeLabel && (
-            <div className='mb-3'>
-              <Badge variant='muted' className='font-normal'>
-                {badgeLabel}
-              </Badge>
-            </div>
-          )}
-
           {/* Title */}
-          <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors mb-6'>
+          <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors mb-2'>
             <span className='line-clamp-2'>{service.title}</span>
           </h3>
+
+          {/* Category */}
+          <div className='mb-2'>
+            <TaxonomiesDisplay
+              taxonomyLabels={badgeTaxonomyLabels}
+              variant='badge'
+            />
+          </div>
 
           {/* Rating + Media Icons - pushed to bottom */}
           <div className='mt-auto flex items-center gap-2'>
@@ -110,6 +108,20 @@ export default function ServiceCard({
         </CardContent>
       </NextLink>
 
+      {/* Coverage Display - Outside link to allow popover interaction */}
+      <div className='px-4 pb-3'>
+        <CoverageDisplay
+          online={service.profile.coverage?.online}
+          onbase={service.profile.coverage?.onbase}
+          onsite={service.profile.coverage?.onsite}
+          area={service.profile.coverage?.area}
+          county={service.profile.coverage?.county}
+          groupedCoverage={service.profile.groupedCoverage || []}
+          variant='compact'
+          className='text-sm'
+        />
+      </div>
+
       {/* Footer section - Outside main link */}
       {showProfile && (
         <CardContent className='p-4 pt-0'>
@@ -120,9 +132,9 @@ export default function ServiceCard({
                 {!hideDisplayName && (
                   <NextLink
                     href={`/profile/${service.profile.username}`}
-                    className='group/profile'
+                    className='group/profile min-w-0 block truncate'
                   >
-                    <span className='text-sm text-body group-hover/profile:text-third transition-colors truncate'>
+                    <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
                       {service.profile.displayName}
                     </span>
                   </NextLink>

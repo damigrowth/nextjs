@@ -12,6 +12,7 @@ export type ServiceWithProfile = Prisma.ServiceGetPayload<{
     profile: {
       select: {
         id: true;
+        uid: true;
         username: true;
         displayName: true;
         firstName: true;
@@ -21,6 +22,7 @@ export type ServiceWithProfile = Prisma.ServiceGetPayload<{
         verified: true;
         image: true;
         portfolio: true;
+        coverage: true;
       };
     };
   };
@@ -83,6 +85,7 @@ export interface UserServicesResponse {
   limit: number;
   totalPages: number;
   canFeatureMore: boolean;
+  canCreateMore: boolean;
 }
 
 // Service status types

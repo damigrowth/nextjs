@@ -126,7 +126,7 @@ export default function SubscriptionManagement({
           {!isCanceling && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant='destructive' size='sm' disabled={isPending}>
+                <Button variant='outline' size='sm' disabled={isPending} className='text-muted-foreground hover:text-muted-foreground/80 border-muted'>
                   {isPending ? (
                     <Loader2 className='size-4 animate-spin' />
                   ) : (

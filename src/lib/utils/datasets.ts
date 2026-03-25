@@ -1872,3 +1872,75 @@ export function updateProTaxonomyItemByLevel<T extends DatasetItem>(
   }) as T[];
 }
 
+// =============================================================================
+// LOCATION ORDERING & FILTERING UTILITIES
+// =============================================================================
+
+// Special location IDs
+export const NATIONWIDE_ID = '54';
+export const CYPRUS_ID = '55';
+
+// Priority counties that always appear first (Αττικής, Θεσσαλονίκης)
+const PRIORITY_COUNTY_IDS = ['2', '12'];
+
+/**
+ * Returns counties ordered: priority first, then alphabetical, Cyprus last.
+ * Excludes the nationwide entry.
+ */
+function getOrderedCounties(locationOptions: DatasetItem[]): DatasetItem[] {
+  const priority: DatasetItem[] = [];
+  const regular: DatasetItem[] = [];
+  let cyprus: DatasetItem | null = null;
+
+  for (const county of locationOptions) {
+    if (county.id === NATIONWIDE_ID) continue;
+    if (county.id === CYPRUS_ID) {
+      cyprus = county;
+    } else if (PRIORITY_COUNTY_IDS.includes(county.id)) {
+      priority.push(county);
+    } else {
+      regular.push(county);
+    }
+  }
+
+  // Sort priority counties in the defined order
+  priority.sort(
+    (a, b) =>
+      PRIORITY_COUNTY_IDS.indexOf(a.id) - PRIORITY_COUNTY_IDS.indexOf(b.id),
+  );
+
+  // Regular counties are already alphabetically sorted in the source data
+  const result = [...priority, ...regular];
+  if (cyprus) result.push(cyprus);
+  return result;
+}
+
+/**
+ * Counties for coverage forms (onboarding + profile coverage).
+ * Includes Πανελλαδικά at the top, then ordered counties.
+ */
+export function getCountiesForCoverageForms(
+  locationOptions: DatasetItem[],
+): DatasetItem[] {
+  const nationwide = locationOptions.find((c) => c.id === NATIONWIDE_ID);
+  const ordered = getOrderedCounties(locationOptions);
+  return nationwide ? [nationwide, ...ordered] : ordered;
+}
+
+/**
+ * Counties for archive filter dropdowns.
+ * Excludes Πανελλαδικά entirely.
+ */
+export function getCountiesForArchiveFilters(
+  locationOptions: DatasetItem[],
+): DatasetItem[] {
+  return getOrderedCounties(locationOptions);
+}
+
+/**
+ * Check if nationwide (Πανελλαδικά) is selected in the counties array.
+ */
+export function isNationwideSelected(countyIds: string[]): boolean {
+  return countyIds.includes(NATIONWIDE_ID);
+}
+

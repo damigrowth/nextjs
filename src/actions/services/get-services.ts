@@ -32,6 +32,7 @@ import {
   findSubdivisionBySlug,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
+import { getCountiesForArchiveFilters, NATIONWIDE_ID } from '@/lib/utils/datasets';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { ServiceCacheKeys } from '@/lib/cache/keys';
@@ -88,6 +89,15 @@ function buildCountyCoverageFilter(countyId: string) {
           },
         },
       },
+      // Include nationwide (Πανελλαδικά) pros in all county filters
+      {
+        profile: {
+          coverage: {
+            path: ['counties'],
+            array_contains: NATIONWIDE_ID,
+          },
+        },
+      },
     ],
   };
 }
@@ -125,6 +135,7 @@ function transformServiceForComponent(
     type: service.type, // Service type JSON object
     profile: {
       id: service.profile.id,
+      uid: service.profile.uid,
       displayName: service.profile.displayName,
       username: service.profile.username,
       image: service.profile.image,
@@ -594,6 +605,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           taxonomyLabels,
           profile: {
             id: service.profile.id,
+            uid: service.profile.uid,
             displayName: service.profile.displayName,
             username: service.profile.username,
             image: service.profile.image,
@@ -1034,6 +1046,15 @@ export async function getServiceArchivePageData(params: {
                       },
                     ],
                   },
+                  // Nationwide (Πανελλαδικά) pros
+                  {
+                    profile: {
+                      coverage: {
+                        path: ['counties'],
+                        array_contains: NATIONWIDE_ID,
+                      },
+                    },
+                  },
                 );
               } else if (countyId) {
                 where.profile = {
@@ -1043,6 +1064,13 @@ export async function getServiceArchivePageData(params: {
                       coverage: {
                         path: ['counties'],
                         array_contains: countyId,
+                      },
+                    },
+                    // Nationwide (Πανελλαδικά) pros
+                    {
+                      coverage: {
+                        path: ['counties'],
+                        array_contains: NATIONWIDE_ID,
                       },
                     },
                   ],
@@ -1067,8 +1095,8 @@ export async function getServiceArchivePageData(params: {
       }
     }
 
-    // Prepare county options
-    const counties = locationOptions.map((location) => ({
+    // Prepare county options (ordered, without Πανελλαδικά)
+    const counties = getCountiesForArchiveFilters(locationOptions).map((location) => ({
       id: location.id,
       label: location.name,
       name: location.name,

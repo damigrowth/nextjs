@@ -10,13 +10,11 @@ interface ServicesHomeProps {
     slug: string;
   }>;
   servicesByCategory: Record<string, ServiceCardData[]>;
-  savedServiceIds?: number[];
 }
 
 export default function ServicesHome({
   mainCategories,
   servicesByCategory,
-  savedServiceIds,
 }: ServicesHomeProps) {
   return (
     <section className='bg-silver overflow-hidden'>
@@ -40,7 +38,6 @@ export default function ServicesHome({
         {/* Services Carousel */}
         <ServicesCarouselWrapper
           servicesByCategory={servicesByCategory}
-          savedServiceIds={savedServiceIds}
         />
       </div>
     </section>

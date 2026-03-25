@@ -10,14 +10,21 @@ import {
   findServiceById,
   findProById,
   findSkillById,
+  batchFindSkillsByIds,
 } from '@/lib/taxonomies';
-import { findById } from '@/lib/utils/datasets';
+import {
+  findById,
+  resolveTaxonomyHierarchy,
+  transformCoverageWithLocationNames,
+} from '@/lib/utils/datasets';
+import { locationOptions } from '@/constants/datasets/locations';
 import type { ActionResult } from '@/lib/types/api';
 import type {
   SavedItemsResponse,
   ServiceCardData,
-  ProfileCardData,
+  ArchiveProfileCardData,
 } from '@/lib/types';
+import type { DatasetItem } from '@/lib/types/datasets';
 import { SAVED_SERVICE_INCLUDE, SAVED_PROFILE_INCLUDE } from '@/lib/database/selects';
 
 /**
@@ -87,6 +94,11 @@ export async function getSavedItems(params?: {
       // OPTIMIZATION: O(1) hash map lookup instead of O(n) findById
       const categoryTaxonomy = findServiceById(service.category);
 
+      const rawCoverage = service.profile.coverage;
+      const transformedCoverage = rawCoverage
+        ? transformCoverageWithLocationNames(rawCoverage as any, locationOptions)
+        : null;
+
       return {
         id: service.id,
         title: service.title,
@@ -99,31 +111,68 @@ export async function getSavedItems(params?: {
         media: service.media,
         profile: {
           id: service.profile.id,
+          uid: service.profile.uid,
           displayName: service.profile.displayName,
           username: service.profile.username,
           image: service.profile.image,
+          coverage: transformedCoverage,
+          groupedCoverage: transformedCoverage?.countyAreasMap || [],
         },
       };
     });
 
-    // Transform profiles to ProfileCardData format
-    const profiles: ProfileCardData[] = savedProfiles.map(({ profile }) => {
-      // OPTIMIZATION: O(1) hash map lookups instead of O(n) findById
-      const subcategoryTaxonomy = findProById(profile.subcategory);
-      const specialitySkill = profile.speciality ? findSkillById(profile.speciality) : null;
+    // Transform profiles to ArchiveProfileCardData format (matching /dir card style)
+    const profiles: ArchiveProfileCardData[] = savedProfiles.map(({ profile }) => {
+      // Resolve taxonomy labels
+      const proTaxonomies = getProTaxonomies();
+      const taxonomyLabels = resolveTaxonomyHierarchy(
+        proTaxonomies,
+        profile.category,
+        profile.subcategory,
+        null,
+      );
+
+      // Resolve skills data
+      const skills = profile.skills ? (profile.skills as string[]) : [];
+      const skillsData = batchFindSkillsByIds(skills).filter(
+        (skill): skill is DatasetItem => skill !== null && skill !== undefined,
+      );
+
+      // Resolve speciality
+      const specialityData = profile.speciality
+        ? findSkillById(profile.speciality) || null
+        : null;
+
+      // Transform coverage with location names
+      const transformedCoverage = transformCoverageWithLocationNames(
+        profile.coverage as any,
+        locationOptions,
+      );
+      const groupedCoverage = transformedCoverage.countyAreasMap || [];
 
       return {
         id: profile.id,
+        uid: profile.uid,
         username: profile.username,
         displayName: profile.displayName,
         tagline: profile.tagline,
-        subcategory: subcategoryTaxonomy?.label || 'Γενικός',
-        speciality: specialitySkill?.label,
+        category: profile.category,
+        subcategory: profile.subcategory,
+        speciality: profile.speciality,
+        skills: profile.skills,
         rating: profile.rating || 0,
         reviewCount: profile.reviewCount || 0,
         verified: profile.verified || false,
+        featured: profile.featured || false,
         top: profile.top || false,
+        rate: profile.rate,
+        coverage: transformedCoverage,
+        groupedCoverage,
         image: profile.image,
+        role: profile.user?.role || 'freelancer',
+        taxonomyLabels,
+        skillsData,
+        specialityData,
       };
     });
 

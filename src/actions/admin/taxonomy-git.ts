@@ -174,12 +174,29 @@ export async function commitMultipleTaxonomyChanges(
       })
     );
 
+    // SAFETY: Deduplicate by file path — if multiple types mapped to the same file,
+    // only keep the last one. This should not happen after the publish fix,
+    // but guards against silent data loss if it does.
+    const seenPaths = new Set<string>();
+    const uniqueTreeItems = [];
+    for (let i = treeItems.length - 1; i >= 0; i--) {
+      if (!seenPaths.has(treeItems[i].path)) {
+        seenPaths.add(treeItems[i].path);
+        uniqueTreeItems.unshift(treeItems[i]);
+      } else {
+        console.warn(
+          `[TAXONOMY_GIT] WARNING: Duplicate file path "${treeItems[i].path}" detected in commit. ` +
+          `This indicates a bug in the publish grouping logic. Keeping last entry only.`
+        );
+      }
+    }
+
     // Create new tree with all file changes
     const { data: newTree } = await octokit.rest.git.createTree({
       owner,
       repo,
       base_tree: currentCommit.tree.sha,
-      tree: treeItems,
+      tree: uniqueTreeItems,
     });
 
     console.log(`[TAXONOMY_GIT] Created tree: ${newTree.sha.substring(0, 7)}`);

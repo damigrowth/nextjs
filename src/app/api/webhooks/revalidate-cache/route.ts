@@ -65,12 +65,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Only revalidate for production deployments
-    const deploymentTarget = (data?.deployment as Record<string, unknown>)?.target;
-    if (data?.type === 'deployment.succeeded' && deploymentTarget !== 'production') {
-      console.log('[REVALIDATE_WEBHOOK] Skipping non-production deployment');
+    // Vercel webhook payload: top-level `type` + `payload.deployment.target`
+    const deploymentTarget =
+      ((data?.payload as Record<string, unknown>)?.deployment as Record<string, unknown>)?.target ??
+      (data?.deployment as Record<string, unknown>)?.target;
+    if (data?.type === 'deployment.succeeded' && deploymentTarget === 'preview') {
+      console.log('[REVALIDATE_WEBHOOK] Skipping preview deployment');
       return NextResponse.json({
         success: true,
-        message: 'Skipped - not a production deployment',
+        message: 'Skipped - preview deployment',
       });
     }
 

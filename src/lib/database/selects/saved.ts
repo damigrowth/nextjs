@@ -17,9 +17,11 @@ export const SAVED_SERVICE_INCLUDE = {
       profile: {
         select: {
           id: true,
+          uid: true,
           username: true,
           displayName: true,
           image: true,
+          coverage: true,
         },
       },
     },

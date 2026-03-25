@@ -34,7 +34,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 todos.js
-yarn.lock
 src/lib/models/entries.js
 
 # Strapi directory
@@ -49,7 +48,6 @@ src/testing/sockets.js
 src/testing/message.js
 src/testing/direct-chat.js
 src/testing/chat.js
-yarn.lock
 new-registration.md
 authentication_flow.md
 src/testing
@@ -59,7 +57,6 @@ src/testing/schema-message.json
 src/testing/schema-notification.json
 src/testing/custom-auth.js
 src/testing/lifecycles.js
-yarn.lock
 sentry.server.config.js
 sentry.edge.config.js
 sentry.client.config.js

@@ -1,4 +1,4 @@
-// Generated on 2026-02-20T15:19:03.586Z
+// Generated on 2026-03-13T09:59:41.600Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const proTaxonomies = [
@@ -744,6 +744,30 @@ export const proTaxonomies = [
           'Ανακάλυψε φροντιστήρια που προσφέρουν υποστήριξη σε μαθήματα και προετοιμασία για εξετάσεις με έμπειρους εκπαιδευτικούς.',
         type: 'company',
       },
+      {
+        id: 'tHVgXW',
+        label: 'Βρεφονηπιοκόμος',
+        slug: 'vrefonipiokomoi',
+        plural: 'Βρεφονηπιοκόμοι',
+        description: '',
+        type: 'freelancer',
+      },
+      {
+        id: 'D21U4L',
+        label: 'Νηπιαγωγός',
+        slug: 'nipiagogoi',
+        plural: 'Νηπιαγωγοί',
+        description: '',
+        type: 'freelancer',
+      },
+      {
+        id: 'pLZfG5',
+        label: 'Παιδαγωγός',
+        slug: 'paidagogoi',
+        plural: 'Παιδαγωγοί',
+        description: '',
+        type: 'freelancer',
+      },
     ],
   },
   {
@@ -1139,6 +1163,46 @@ export const proTaxonomies = [
         slug: 'odontiatroi',
         plural: 'Οδοντίατροι',
         description: 'Βρες τον καλύτερο οδοντίατρο για λευκά και υγιή δόντια.',
+        type: 'freelancer',
+      },
+      {
+        id: 'VaR4aJ',
+        label: 'Μαία',
+        slug: 'maies',
+        plural: 'Μαίες',
+        description: '',
+        type: 'freelancer',
+      },
+      {
+        id: 'JpBfVC',
+        label: 'Νοσηλευτής',
+        slug: 'nosileutes',
+        plural: 'Νοσηλευτές',
+        description: '',
+        type: 'freelancer',
+      },
+      {
+        id: 'f2xaFR',
+        label: 'Οικιακή βοηθός',
+        slug: 'oikiakes-voithoi',
+        plural: 'Οικιακές βοηθοί',
+        description: '',
+        type: 'freelancer',
+      },
+      {
+        id: '9L-575',
+        label: 'Γηροκόμος',
+        slug: 'girokomoi',
+        plural: 'Γηροκόμοι',
+        description: '',
+        type: 'freelancer',
+      },
+      {
+        id: 'apftPC',
+        label: 'Ψυχολόγος',
+        slug: 'psuxologoi',
+        plural: 'Ψυχολόγοι',
+        description: '',
         type: 'freelancer',
       },
     ],
@@ -3147,11 +3211,11 @@ export const proTaxonomies = [
       },
       {
         id: 'N3Kx-C',
-        label: 'Περιπατητής Σκύλων',
-        slug: 'peripatites-skulon',
-        plural: 'Περιπατητές Σκύλων',
+        label: 'Dog walker',
+        slug: 'dog-walkers',
+        plural: 'Dog walkers',
         description:
-          'Ανακάλυψε περιπατητές σκύλων που φροντίζουν το κατοικίδιό σου με αγάπη και επαγγελματισμό, όταν εσύ δεν μπορείς.',
+          'Ανακάλυψε dog walkers που φροντίζουν το κατοικίδιό σου με αγάπη και επαγγελματισμό, όταν εσύ δεν μπορείς.',
         type: 'freelancer',
       },
       {
@@ -3242,6 +3306,14 @@ export const proTaxonomies = [
         plural: 'Φροντιστές Ζώων',
         description:
           'Ανακάλυψε φροντιστές ζώων που προσφέρουν φροντίδα, εκπαίδευση και υποστήριξη για κάθε ανάγκη των κατοικιδίων σου.',
+        type: 'freelancer',
+      },
+      {
+        id: 'YJrL3k',
+        label: 'Pet sitter',
+        slug: 'pet-sitters',
+        plural: 'Pet sitters',
+        description: '',
         type: 'freelancer',
       },
     ],

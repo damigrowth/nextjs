@@ -3,7 +3,6 @@ export { default as ProfileMeta } from './profile-meta';
 export { default as ProfileMetrics } from './profile-metrics';
 export { default as ProfileBio } from './profile-bio';
 export { default as ProfileFeatures } from './profile-features';
-export { default as ProfileIndustries } from './profile-industries';
 export { default as ProfilePortfolio } from './profile-portfolio';
 export { default as ProfileServices } from './profile-services';
 export { default as ProfileTerms } from './profile-terms';

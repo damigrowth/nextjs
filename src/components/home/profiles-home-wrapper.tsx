@@ -1,42 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSession } from '@/lib/auth/client';
-import { getUserSavedState } from '@/actions/saved';
+import { useMemo } from 'react';
 import ProfilesHome from './home-profiles';
-import { ProfileCardData } from '@/lib/types';
+import type { ArchiveProfileCardData } from '@/lib/types/components';
+
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 interface ProfilesHomeWrapperProps {
-  profiles: ProfileCardData[];
+  profiles: ArchiveProfileCardData[];
 }
 
 export function ProfilesHomeWrapper({ profiles }: ProfilesHomeWrapperProps) {
-  const { data: session } = useSession();
-  const [savedProfileIds, setSavedProfileIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Shuffle profiles client-side so each visit gets a fresh order
+  const shuffledProfiles = useMemo(() => shuffleArray(profiles), [profiles]);
 
-  useEffect(() => {
-    async function fetchSavedState() {
-      try {
-        if (!session?.user?.id) {
-          setIsLoading(false);
-          return;
-        }
-
-        const savedState = await getUserSavedState(session.user.id);
-        const idsArray = Array.from(savedState.profileIds);
-        setSavedProfileIds(idsArray);
-      } catch (error) {
-        console.error('Failed to fetch saved state:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchSavedState();
-  }, [session]);
-
-  return (
-    <ProfilesHome profiles={profiles} savedProfileIds={savedProfileIds} />
-  );
+  return <ProfilesHome profiles={shuffledProfiles} />;
 }

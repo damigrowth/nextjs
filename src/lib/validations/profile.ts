@@ -211,11 +211,6 @@ export const additionalProfileInfoSchema = z.object({
     .nullable(),
   terms: z.string().optional().nullable(),
   budget: z.string().optional().nullable(), // Updated field name
-  industries: z
-    .array(z.string())
-    .max(10, 'You can select up to 10 industries')
-    .optional()
-    .nullable(),
   contactMethods: z.array(z.string()).optional().nullable(), // Updated field name
   paymentMethods: z.array(z.string()).optional().nullable(), // Updated field name
   settlementMethods: z.array(z.string()).optional().nullable(), // Updated field name
@@ -354,7 +349,7 @@ export const presentationSchema = z.object({
       address: z.boolean(),
     })
     .default({
-      email: true,
+      email: false,
       phone: true,
       address: true,
     }),
@@ -500,10 +495,6 @@ export const profileAdditionalInfoUpdateSchema = z.object({
   paymentMethods: z.array(z.string()).optional(),
   settlementMethods: z.array(z.string()).optional(),
   budget: z.string().optional().or(z.literal('')),
-  industries: z
-    .array(z.string())
-    .max(10, 'Maximum 10 industries allowed')
-    .optional(),
   terms: z.string().optional().or(z.literal('')),
 });
 

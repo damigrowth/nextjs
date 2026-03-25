@@ -7,6 +7,7 @@ import {
 import { getProvider } from './factory';
 import type { CheckoutSessionParams, CustomerPortalParams } from './types';
 import { ProviderNotConfiguredError } from './types';
+import { findCoupon } from './coupons';
 
 /**
  * PaymentService - Provider-agnostic facade for subscription management.
@@ -52,6 +53,9 @@ export class PaymentService {
       ? session.sessionId.slice(3)
       : session.sessionId;
 
+    // Resolve coupon discount fields for DB storage
+    const coupon = params.couponCode ? findCoupon(params.couponCode) : null;
+
     await prisma.subscription.upsert({
       where: { pid: params.profileId },
       create: {
@@ -61,10 +65,14 @@ export class PaymentService {
         status: SubscriptionStatus.incomplete,
         providerSubscriptionId: pendingOrderId,
         billingInterval: params.billingInterval,
+        discountCode: coupon?.code || null,
+        discountPercentOff: coupon?.percentOff || null,
       },
       update: {
         providerSubscriptionId: pendingOrderId,
         billingInterval: params.billingInterval,
+        discountCode: coupon?.code || null,
+        discountPercentOff: coupon?.percentOff || null,
         updatedAt: new Date(),
       },
     });

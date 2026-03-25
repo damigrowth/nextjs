@@ -28,17 +28,18 @@ export async function getPlanLimits(profileId: string) {
 }
 
 /**
- * Check if a profile can publish more services.
+ * Check if a profile can create/publish more services.
+ * Counts both published and pending services against the plan limit.
  */
-export async function canPublishService(profileId: string): Promise<boolean> {
+export async function canCreateService(profileId: string): Promise<boolean> {
   const plan = await getActivePlan(profileId);
   const limits = SUBSCRIPTION_PLANS[plan];
 
-  const publishedCount = await prisma.service.count({
-    where: { pid: profileId, status: 'published' },
+  const activeCount = await prisma.service.count({
+    where: { pid: profileId, status: { in: ['published', 'pending'] } },
   });
 
-  return publishedCount < limits.maxServices;
+  return activeCount < limits.maxServices;
 }
 
 /**

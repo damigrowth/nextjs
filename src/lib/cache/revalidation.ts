@@ -77,6 +77,11 @@ export async function revalidateService(params: {
     revalidatePath('/');
   }
 
+  // Taxonomy-specific tags (getCategoriesPageData uses these)
+  revalidateTag('services');
+  revalidateTag('categories');
+  revalidateTag('categories-page');
+
   // Paths
   if (slug) {
     revalidatePath(`/s/${slug}`);
@@ -84,8 +89,11 @@ export async function revalidateService(params: {
   if (profileUsername) {
     revalidatePath(`/profile/${profileUsername}`);
   }
-  revalidatePath('/ipiresies');
-  revalidatePath('/categories');
+  revalidatePath('/ipiresies', 'page');
+  revalidatePath('/ipiresies/[subcategory]', 'page');
+  revalidatePath('/ipiresies/[subcategory]/[subdivision]', 'page');
+  revalidatePath('/categories', 'page');
+  revalidatePath('/categories/[category]', 'page');
   revalidateTag(CACHE_TAGS.categories.all);
 }
 

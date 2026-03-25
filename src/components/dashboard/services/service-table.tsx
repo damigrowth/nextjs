@@ -18,6 +18,7 @@ import TaxonomiesDisplay from '../../shared/taxonomies-display';
 import ServiceTableHeaderSort from './service-table-header-sort';
 import ServiceRefreshButton from './service-refresh-button';
 import FeaturedStarButton from './featured-star-button';
+import CreateServiceButton from './create-service-button';
 import type {
   UserServiceTableData,
   ServiceSortField,
@@ -32,6 +33,7 @@ interface ServiceTableProps {
     order: SortOrder;
   };
   canFeatureMore: boolean;
+  canCreateMore: boolean;
   className?: string;
 }
 
@@ -39,6 +41,7 @@ export default function ServiceTable({
   services,
   currentSort,
   canFeatureMore,
+  canCreateMore,
   className,
 }: ServiceTableProps) {
   // Empty state
@@ -78,11 +81,9 @@ export default function ServiceTable({
                       Δημιούργησε την πρώτη σου υπηρεσία για να ξεκινήσεις
                     </p>
                   </div>
-                  <Button variant='link' asChild>
-                    <NextLink href='/dashboard/services/create'>
-                      Δημιουργία Υπηρεσίας
-                    </NextLink>
-                  </Button>
+                  <CreateServiceButton canCreateMore={canCreateMore}>
+                    Δημιουργία Υπηρεσίας
+                  </CreateServiceButton>
                 </div>
               </TableCell>
             </TableRow>

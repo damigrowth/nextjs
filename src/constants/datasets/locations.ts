@@ -7,7 +7,7 @@
 export const locationOptions = [
   {
     'id': '19',
-    'name': 'Αιτωλοακαρνανία',
+    'name': 'Αιτωλοακαρνανίας',
     'children': [
       {
         'id': '23',
@@ -399,7 +399,7 @@ export const locationOptions = [
   },
   {
     'id': '11',
-    'name': 'Αργολίδα',
+    'name': 'Αργολίδας',
     'children': [
       {
         'id': '121',
@@ -551,7 +551,7 @@ export const locationOptions = [
   },
   {
     'id': '18',
-    'name': 'Αρκαδία',
+    'name': 'Αρκαδίας',
     'children': [
       {
         'id': '22',
@@ -943,7 +943,7 @@ export const locationOptions = [
   },
   {
     'id': '31',
-    'name': 'Άρτα',
+    'name': 'Άρτας',
     'children': [
       {
         'id': '45',
@@ -1083,7 +1083,7 @@ export const locationOptions = [
   },
   {
     'id': '2',
-    'name': 'Αττική',
+    'name': 'Αττικής',
     'children': [
       {
         'id': '2',
@@ -4119,7 +4119,7 @@ export const locationOptions = [
   },
   {
     'id': '36',
-    'name': 'Αχαΐα',
+    'name': 'Αχαΐας',
     'children': [
       {
         'id': '58',
@@ -4483,7 +4483,7 @@ export const locationOptions = [
   },
   {
     'id': '21',
-    'name': 'Βοιωτία',
+    'name': 'Βοιωτίας',
     'children': [
       {
         'id': '25',
@@ -4671,7 +4671,7 @@ export const locationOptions = [
   },
   {
     'id': '22',
-    'name': 'Γρεβενά',
+    'name': 'Γρεβενών',
     'children': [
       {
         'id': '26',
@@ -4739,7 +4739,7 @@ export const locationOptions = [
   },
   {
     'id': '17',
-    'name': 'Δράμα',
+    'name': 'Δράμας',
     'children': [
       {
         'id': '21',
@@ -4879,7 +4879,7 @@ export const locationOptions = [
   },
   {
     'id': '45',
-    'name': 'Δωδεκάνησα',
+    'name': 'Δωδεκανήσων',
     'children': [
       {
         'id': '93',
@@ -5199,7 +5199,7 @@ export const locationOptions = [
   },
   {
     'id': '38',
-    'name': 'Εβρου',
+    'name': 'Έβρου',
     'children': [
       {
         'id': '62',
@@ -5423,7 +5423,7 @@ export const locationOptions = [
   },
   {
     'id': '5',
-    'name': 'Εύβοια',
+    'name': 'Εύβοιας',
     'children': [
       {
         'id': '5',
@@ -5731,7 +5731,7 @@ export const locationOptions = [
   },
   {
     'id': '13',
-    'name': 'Ευρυτανία',
+    'name': 'Ευρυτανίας',
     'children': [
       {
         'id': '13',
@@ -5915,7 +5915,7 @@ export const locationOptions = [
   },
   {
     'id': '42',
-    'name': 'Ηλεία',
+    'name': 'Ηλείας',
     'children': [
       {
         'id': '78',
@@ -6199,7 +6199,7 @@ export const locationOptions = [
   },
   {
     'id': '40',
-    'name': 'Ημαθία',
+    'name': 'Ημαθίας',
     'children': [
       {
         'id': '69',
@@ -6775,7 +6775,7 @@ export const locationOptions = [
   },
   {
     'id': '12',
-    'name': 'Θεσσαλονίκη',
+    'name': 'Θεσσαλονίκης',
     'children': [
       {
         'id': '12',
@@ -7418,18 +7418,6 @@ export const locationOptions = [
         'slug': 'panorama'
       },
       {
-        'id': '683',
-        'name': 'Πανοραμό',
-        'children': [
-          {
-            'id': '1145',
-            'name': '55236'
-          }
-        ],
-        'child_count': 1,
-        'slug': 'panoramo'
-      },
-      {
         'id': '729',
         'name': 'Πολίχνη',
         'children': [
@@ -7618,7 +7606,7 @@ export const locationOptions = [
         'slug': 'oraiokastro'
       }
     ],
-    'child_count': 44,
+    'child_count': 43,
     'slug': 'thessaloniki'
   },
   {
@@ -7931,7 +7919,7 @@ export const locationOptions = [
   },
   {
     'id': '43',
-    'name': 'Καβάλα',
+    'name': 'Καβάλας',
     'children': [
       {
         'id': '86',
@@ -8139,7 +8127,7 @@ export const locationOptions = [
   },
   {
     'id': '32',
-    'name': 'Καρδίτσα',
+    'name': 'Καρδίτσας',
     'children': [
       {
         'id': '46',
@@ -8315,7 +8303,7 @@ export const locationOptions = [
   },
   {
     'id': '39',
-    'name': 'Καστοριά',
+    'name': 'Καστοριάς',
     'children': [
       {
         'id': '65',
@@ -8475,7 +8463,7 @@ export const locationOptions = [
   },
   {
     'id': '50',
-    'name': 'Κερκύρας',
+    'name': 'Κέρκυρας',
     'children': [
       {
         'id': '213',
@@ -8555,7 +8543,7 @@ export const locationOptions = [
   },
   {
     'id': '8',
-    'name': 'Κεφαλληνίας',
+    'name': 'Κεφαλονιάς',
     'children': [
       {
         'id': '8',
@@ -9930,7 +9918,7 @@ export const locationOptions = [
   },
   {
     'id': '4',
-    'name': 'Λαρίσης',
+    'name': 'Λάρισας',
     'children': [
       {
         'id': '4',
@@ -10574,7 +10562,7 @@ export const locationOptions = [
   },
   {
     'id': '47',
-    'name': 'Λευκάδος',
+    'name': 'Λευκάδας',
     'children': [
       {
         'id': '162',
@@ -11422,7 +11410,7 @@ export const locationOptions = [
   },
   {
     'id': '34',
-    'name': 'Πέλλης',
+    'name': 'Πέλλας',
     'children': [
       {
         'id': '54',
@@ -11666,7 +11654,7 @@ export const locationOptions = [
   },
   {
     'id': '51',
-    'name': 'Πρεβέζης',
+    'name': 'Πρέβεζας',
     'children': [
       {
         'id': '330',
@@ -11746,7 +11734,7 @@ export const locationOptions = [
   },
   {
     'id': '7',
-    'name': 'Ρεθύμνης',
+    'name': 'Ρεθύμνου',
     'children': [
       {
         'id': '7',
@@ -12110,7 +12098,7 @@ export const locationOptions = [
   },
   {
     'id': '54',
-    'name': 'Σε όλη την Ελλάδα',
+    'name': 'Πανελλαδικά',
     'children': [],
     'child_count': 0,
     'slug': 'se-oli-tin-ellada'
@@ -12517,7 +12505,7 @@ export const locationOptions = [
   },
   {
     'id': '24',
-    'name': 'Φθιώτιδος',
+    'name': 'Φθιώτιδας',
     'children': [
       {
         'id': '28',
@@ -12777,7 +12765,7 @@ export const locationOptions = [
   },
   {
     'id': '20',
-    'name': 'Φλωρίνης',
+    'name': 'Φλώρινας',
     'children': [
       {
         'id': '24',
@@ -12917,7 +12905,7 @@ export const locationOptions = [
   },
   {
     'id': '44',
-    'name': 'Φωκίδος',
+    'name': 'Φωκίδας',
     'children': [
       {
         'id': '90',
@@ -13117,7 +13105,7 @@ export const locationOptions = [
   },
   {
     'id': '29',
-    'name': 'Χαλκιδική',
+    'name': 'Χαλκιδικής',
     'children': [
       {
         'id': '40',
@@ -13485,7 +13473,7 @@ export const locationOptions = [
           }
         ],
         'child_count': 1,
-        'slug': 'kolumvari'
+        'slug': 'kolumvari' 
       },
       {
         'id': '588',

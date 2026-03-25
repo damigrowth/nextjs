@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useTransition } from 'react';
+import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Share2,
@@ -26,71 +26,47 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { BreadcrumbButtonsProps } from '@/lib/types';
 import { useSession } from '@/lib/auth/client';
-import { getUserSavedState, toggleSave } from '@/actions/saved';
+import { toggleSave } from '@/actions/saved';
+import { useSavedState } from '@/lib/providers/saved-state-provider';
 
 export default function BreadcrumbButtons({
   subjectTitle,
   id,
   saveType,
+  isOwner = false,
 }: BreadcrumbButtonsProps) {
   const router = useRouter();
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const { data: session } = useSession();
-  const [isSaved, setIsSaved] = useState(false);
+  const { isSaved: checkSaved, updateSavedState } = useSavedState();
   const [isPending, startTransition] = useTransition();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
-  // Fetch saved state on mount if user is authenticated
-  useEffect(() => {
-    if (session?.user?.id && saveType) {
-      const fetchSavedState = async () => {
-        try {
-          const savedState = await getUserSavedState(session.user.id);
-
-          if (saveType === 'service') {
-            const serviceId = typeof id === 'string' ? parseInt(id) : id;
-            setIsSaved(savedState.serviceIds.has(serviceId));
-          } else if (saveType === 'profile') {
-            const profileId = String(id);
-            setIsSaved(savedState.profileIds.has(profileId));
-          }
-        } catch (error) {
-          console.error('Failed to fetch saved state:', error);
-        }
-      };
-
-      fetchSavedState();
-    }
-  }, [session?.user?.id, saveType, id]);
+  const itemType = saveType as 'service' | 'profile' | undefined;
+  const isSaved = itemType && !isOwner ? checkSaved(itemType, id) : false;
 
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!saveType) return;
+    if (!itemType) return;
 
-    // Check if user is authenticated
     if (!session?.user) {
       setShowAuthDialog(true);
       return;
     }
 
-    // Optimistic update
     const previousState = isSaved;
     const newState = !isSaved;
-    setIsSaved(newState);
+    updateSavedState(itemType, id, newState);
 
-    // Background server action
     startTransition(async () => {
-      const itemType = saveType === 'service' ? 'service' : 'profile';
       const result = await toggleSave(itemType, id);
 
       if (!result.success) {
-        // Revert on error
-        setIsSaved(previousState);
+        updateSavedState(itemType, id, previousState);
       } else if (result.data) {
-        // Update with actual server state
-        setIsSaved(result.data.isSaved);
+        updateSavedState(itemType, id, result.data.isSaved);
       }
     });
   };
@@ -217,8 +193,8 @@ export default function BreadcrumbButtons({
           </PopoverContent>
         </Popover>
 
-        {/* Save Button */}
-        {saveType && (
+        {/* Save Button — hidden for owners (server-computed, no hydration issue) */}
+        {saveType && !isOwner && (
           <>
             <Separator orientation='vertical' className='h-6' />
             <Button

@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getSavedItems } from '@/actions/saved';
 import ServiceCard from '@/components/shared/service-card';
-import { ProfileCard } from '@/components/shared/profile-card';
+import { ArchiveProfileCard } from '@/components/archives/archive-profile-card';
 import SavedPagination from '@/components/dashboard/saved/saved-pagination';
 import { Heart } from 'lucide-react';
 import { getDashboardMetadata } from '@/lib/seo/pages';
@@ -122,7 +122,6 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
                   <ServiceCard
                     key={service.id}
                     service={service}
-                    isSaved={true}
                     showProfile={true}
                   />
                 ))}
@@ -160,12 +159,12 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
             </Card>
           ) : (
             <>
-              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
                 {profiles.map((profile) => (
-                  <ProfileCard
+                  <ArchiveProfileCard
                     key={profile.id}
                     profile={profile}
-                    isSaved={true}
+                    variant='vertical'
                   />
                 ))}
               </div>

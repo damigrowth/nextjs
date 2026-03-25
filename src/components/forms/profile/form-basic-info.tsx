@@ -11,7 +11,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 // Shadcn UI components
 import { Input } from '@/components/ui/input';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import dynamic from 'next/dynamic';
+const RichTextEditor = dynamic(() => import('@/components/ui/rich-text-editor').then(mod => ({ default: mod.RichTextEditor })), { ssr: false });
 import {
   Form,
   FormControl,

@@ -10,14 +10,20 @@ import {
   findProById,
   findServiceBySlug,
   findSkillById,
+  batchFindSkillsByIds,
 } from '@/lib/taxonomies';
-import { findById, resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
+import {
+  findById,
+  resolveTaxonomyHierarchy,
+  transformCoverageWithLocationNames,
+} from '@/lib/utils/datasets';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { HomeCacheKeys } from '@/lib/cache/keys';
 import { CACHE_TAGS } from '@/lib/cache';
 import type { ActionResult } from '@/lib/types/api';
-import type { ServiceCardData, ProfileCardData } from '@/lib/types/components';
+import type { ServiceCardData, ArchiveProfileCardData } from '@/lib/types/components';
+import { locationOptions } from '@/constants/datasets/locations';
 import type { ServiceWithProfile } from '@/lib/types/services';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { Prisma } from '@prisma/client';
@@ -41,6 +47,12 @@ function transformServiceForComponent(
     service.subdivision,
   );
 
+  // Transform coverage for location display
+  const rawCoverage = service.profile.coverage;
+  const transformedCoverage = rawCoverage
+    ? transformCoverageWithLocationNames(rawCoverage as any, locationOptions)
+    : null;
+
   return {
     id: service.id,
     title: service.title,
@@ -54,37 +66,68 @@ function transformServiceForComponent(
     media: service.media,
     profile: {
       id: service.profile.id,
+      uid: service.profile.uid,
       displayName: service.profile.displayName,
       username: service.profile.username,
       image: service.profile.image,
+      coverage: transformedCoverage,
+      groupedCoverage: transformedCoverage?.countyAreasMap || [],
     },
   };
 }
 
-// Transform profile to profile card format
-function transformProfileForComponent(profile: any): ProfileCardData {
-  // OPTIMIZATION: O(1) hash map lookups instead of O(n) findById
-  const subcategoryTaxonomy = findProById(profile.subcategory);
-  const subcategoryLabel = subcategoryTaxonomy?.label || 'Γενικός';
+// Transform profile to archive profile card format (matching /dir card style)
+function transformProfileForComponent(profile: any): ArchiveProfileCardData {
+  // Resolve taxonomy labels
+  const proTaxonomies = getProTaxonomies();
+  const taxonomyLabels = resolveTaxonomyHierarchy(
+    proTaxonomies,
+    profile.category,
+    profile.subcategory,
+    null,
+  );
 
-  // Resolve speciality label for display - speciality is a skill ID - O(1) optimized
-  const specialitySkill = profile.speciality
-    ? findSkillById(profile.speciality)
+  // Resolve skills data
+  const skills = profile.skills ? (profile.skills as string[]) : [];
+  const skillsData = batchFindSkillsByIds(skills).filter(
+    (skill): skill is DatasetItem => skill !== null && skill !== undefined,
+  );
+
+  // Resolve speciality
+  const specialityData = profile.speciality
+    ? findSkillById(profile.speciality) || null
     : null;
-  const specialityLabel = specialitySkill?.label;
+
+  // Transform coverage with location names
+  const transformedCoverage = transformCoverageWithLocationNames(
+    profile.coverage as any,
+    locationOptions,
+  );
+  const groupedCoverage = transformedCoverage.countyAreasMap || [];
 
   return {
     id: profile.id,
+    uid: profile.uid,
     username: profile.username,
     displayName: profile.displayName,
     tagline: profile.tagline,
-    subcategory: subcategoryLabel, // Resolved subcategory label, not ID
-    speciality: specialityLabel, // Resolved speciality label, not ID
+    category: profile.category,
+    subcategory: profile.subcategory,
+    speciality: profile.speciality,
+    skills: profile.skills,
     rating: profile.rating || 0,
     reviewCount: profile.reviewCount || 0,
     verified: profile.verified || false,
+    featured: profile.featured || false,
     top: profile.top || false,
-    image: profile.image, // This will be the proper Cloudinary resource or string
+    rate: profile.rate,
+    coverage: transformedCoverage,
+    groupedCoverage,
+    image: profile.image,
+    role: profile.user?.role || 'freelancer',
+    taxonomyLabels,
+    skillsData,
+    specialityData,
   };
 }
 
@@ -102,7 +145,7 @@ export interface FeaturedServicesData {
 // Combined home page data
 export interface HomePageData {
   services: FeaturedServicesData;
-  profiles: ProfileCardData[];
+  profiles: ArchiveProfileCardData[];
   popularSubcategories: DatasetItem[]; // DatasetItem with count property
   categoriesWithSubcategories: DatasetItem[]; // DatasetItem with subcategories array
   proSubcategoriesWithProfiles: DatasetItem[]; // Pro subcategories that have profiles

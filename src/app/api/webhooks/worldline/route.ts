@@ -7,6 +7,7 @@ import {
   BillingInterval,
 } from '@prisma/client';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
+import { findCoupon } from '@/lib/payment/coupons';
 import { getWorldlineSharedSecret } from '@/lib/payment/worldline-config';
 import { validateResponseDigestFromFormData } from '@/lib/payment/providers/worldline/digest';
 import type { WorldlineResponseParams, WorldlineStatus } from '@/lib/payment/providers/worldline/types';
@@ -133,15 +134,19 @@ export async function POST(request: NextRequest) {
   let profileId = (formData.get('var1') as string) || '';
   let plan = (formData.get('var2') as string) || 'promoted';
   let billingInterval = (formData.get('var3') as string) || 'month';
+  let couponCode = (formData.get('var4') as string) || '';
 
   if (!profileId && params.orderid) {
     const pending = await prisma.subscription.findFirst({
       where: { providerSubscriptionId: params.orderid },
-      select: { pid: true, billingInterval: true },
+      select: { pid: true, billingInterval: true, discountCode: true },
     });
     if (pending) {
       profileId = pending.pid;
       billingInterval = pending.billingInterval || 'month';
+      if (!couponCode && pending.discountCode) {
+        couponCode = pending.discountCode;
+      }
     }
   }
 
@@ -168,7 +173,7 @@ export async function POST(request: NextRequest) {
 
   // Handle based on status
   if (status === 'CAPTURED' || status === 'AUTHORIZED') {
-    await handlePaymentSuccess(params, profileId, plan, billingInterval);
+    await handlePaymentSuccess(params, profileId, plan, billingInterval, couponCode);
     if (isBackgroundConfirmation) {
       return NextResponse.json({ status: 'ok' });
     }
@@ -196,6 +201,7 @@ async function handlePaymentSuccess(
   profileId: string,
   plan: string,
   billingInterval: string,
+  couponCode?: string,
 ) {
   if (!profileId) {
     console.error('[Worldline Webhook] No profileId in payment response');
@@ -212,6 +218,9 @@ async function handlePaymentSuccess(
 
   // Amount in cents for consistency with Stripe
   const amountCents = Math.round(parseFloat(params.orderAmount) * 100);
+
+  // Resolve coupon for discount tracking
+  const coupon = couponCode ? findCoupon(couponCode) : null;
 
   const profile = await prisma.profile.findUnique({
     where: { id: profileId },
@@ -241,6 +250,8 @@ async function handlePaymentSuccess(
         paymentMethodType: 'card',
         paymentMethodLast4: params.extTokenPanEnd || null,
         paymentMethodBrand: params.payMethod || null,
+        discountCode: coupon?.code || null,
+        discountPercentOff: coupon?.percentOff || null,
         firstPaymentAt: now,
         lastPaymentAt: now,
         paymentCount: 1,
@@ -265,6 +276,8 @@ async function handlePaymentSuccess(
         paymentMethodType: 'card',
         paymentMethodLast4: params.extTokenPanEnd || null,
         paymentMethodBrand: params.payMethod || null,
+        discountCode: coupon?.code || null,
+        discountPercentOff: coupon?.percentOff || null,
         lastPaymentAt: now,
         paymentCount: { increment: 1 },
         totalPaidLifetime: { increment: amountCents },

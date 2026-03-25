@@ -6,7 +6,6 @@ import {
   ProfileMetricsSkeleton,
   ProfileBioSkeleton,
   ProfileFeaturesSkeleton,
-  ProfileIndustriesSkeleton,
   ProfilePortfolioSkeleton,
   ProfileServicesSkeleton,
   ProfileTermsSkeleton,
@@ -45,9 +44,6 @@ export default function ProfileLoading() {
 
               {/* Profile Features */}
               <ProfileFeaturesSkeleton />
-
-              {/* Profile Industries */}
-              <ProfileIndustriesSkeleton />
 
               {/* Profile Portfolio */}
               <ProfilePortfolioSkeleton />

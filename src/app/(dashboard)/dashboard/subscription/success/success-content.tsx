@@ -94,7 +94,7 @@ export default function SuccessContent({
       <Card className='max-w-md w-full'>
         <CardContent className='pt-6 text-center space-y-4'>
           <CheckCircle2 className='size-16 text-green-600 mx-auto' />
-          <h1 className='text-2xl font-bold'>Καλώς ήρθατε στο Προωθημένο!</h1>
+          <h1 className='text-2xl font-bold'>Το Προωθημένο Πακέτο ενεργοποιήθηκε!</h1>
           <p className='text-muted-foreground'>
             Η συνδρομή σας ενεργοποιήθηκε επιτυχώς. Απολαύστε όλα τα προνόμια
             του Προωθημένου πακέτου.

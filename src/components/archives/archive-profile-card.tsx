@@ -9,14 +9,17 @@ import UserAvatar from '@/components/shared/user-avatar';
 import ProfileBadges from '@/components/shared/profile-badges';
 import RatingDisplay from '@/components/shared/rating-display';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
+import SaveButton from '@/components/shared/save-button';
 
 interface ArchiveProfileCardProps {
   profile: ArchiveProfileCardData;
+  variant?: 'horizontal' | 'vertical';
   className?: string;
 }
 
 export function ArchiveProfileCard({
   profile,
+  variant = 'horizontal',
   className,
 }: ArchiveProfileCardProps) {
   // Format rate display
@@ -33,15 +36,28 @@ export function ArchiveProfileCard({
   return (
     <Card
       className={cn(
-        'hover:shadow-md transition-shadow duration-200 overflow-hidden',
+        'group relative hover:shadow-md transition-shadow duration-200 overflow-hidden h-full',
         className,
       )}
     >
-      <div className='flex flex-col md:flex-row h-full md:h-52'>
+      {/* Save Button - appears on hover */}
+      <div className='absolute top-3 right-3 z-20'>
+        <SaveButton itemType='profile' itemId={profile.id} ownerId={profile.uid} />
+      </div>
+
+      <div className={cn(
+        'flex flex-col h-full',
+        variant === 'horizontal' && 'md:flex-row md:h-52',
+      )}>
         {/* Avatar Section */}
         <NextLink
           href={`/profile/${profile.username}`}
-          className='group w-full md:w-48 flex-shrink-0 relative overflow-hidden flex md:items-center md:justify-center pl-5 md:pl-0 bg-gray-50 bg-cover bg-center bg-no-repeat min-h-28'
+          className={cn(
+            'group w-full flex-shrink-0 relative overflow-hidden flex bg-gray-50 bg-cover bg-center bg-no-repeat min-h-28',
+            variant === 'horizontal'
+              ? 'md:w-48 md:items-center md:justify-center pl-5 md:pl-0'
+              : 'pl-5',
+          )}
           style={{
             backgroundImage: optimizedBgImage
               ? `url(${optimizedBgImage})`
@@ -135,40 +151,40 @@ export function ArchiveProfileCard({
             </div>
 
             {/* Bottom section - only show if there are skills/speciality or rate */}
-            {(profile.skillsData.length > 0 ||
+            {((profile.skillsData?.length ?? 0) > 0 ||
               profile.specialityData ||
               (profile.rate != null && profile.rate > 0)) && (
               <div className='flex items-center gap-3 border-t border-gray-200 mt-3 pt-3'>
                 {/* Skills and Speciality */}
                 <div className='flex-1'>
-                  {(profile.skillsData.length > 0 || profile.specialityData) &&
+                  {((profile.skillsData?.length ?? 0) > 0 || profile.specialityData) &&
                     (() => {
-                      // Filter out speciality from skills to avoid duplication
-                      const filteredSkills = profile.skillsData.filter(
+                      const filteredSkills = (profile.skillsData ?? []).filter(
                         (skill) =>
                           skill.label !== profile.specialityData?.label,
                       );
+                      const maxVisible = variant === 'vertical' ? 1 : 2;
 
                       return (
-                        <div className='flex items-center gap-2 flex-wrap'>
+                        <div className='flex items-center gap-2 flex-nowrap overflow-hidden'>
                           {profile.specialityData && (
                             <Badge
                               variant='muted'
-                              className='text-primary/80 border-primary/20'
+                              className='text-primary/80 border-primary/20 flex-shrink-0'
                             >
                               {profile.specialityData.label}
                             </Badge>
                           )}
                           {filteredSkills.length > 0 && (
                             <>
-                              {filteredSkills.slice(0, 2).map((skill) => (
-                                <Badge key={skill.id} variant='muted'>
+                              {filteredSkills.slice(0, maxVisible).map((skill) => (
+                                <Badge key={skill.id} variant='muted' className='flex-shrink-0'>
                                   {skill.label}
                                 </Badge>
                               ))}
-                              {filteredSkills.length > 2 && (
-                                <Badge variant='muted'>
-                                  +{filteredSkills.length - 2}
+                              {filteredSkills.length > maxVisible && (
+                                <Badge variant='muted' className='flex-shrink-0 px-0 py-0 text-xs min-w-0 border-0 bg-transparent'>
+                                  +{filteredSkills.length - maxVisible}
                                 </Badge>
                               )}
                             </>

@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import ServiceTable from '@/components/dashboard/services/service-table';
 import ServiceTableFilters from '@/components/dashboard/services/service-table-filters';
 import ServicePagination from '@/components/dashboard/services/service-pagination';
+import CreateServiceButton from '@/components/dashboard/services/create-service-button';
 import {
   getUserServices,
   getUserServiceStats,
@@ -64,12 +65,7 @@ export default async function ServicesPage({
               Διαχείριση Υπηρεσιών
             </h1>
           </div>
-          <Button asChild>
-            <NextLink href='/dashboard/services/create'>
-              <Plus className='w-4 h-4 mr-2' />
-              Νέα Υπηρεσία
-            </NextLink>
-          </Button>
+          <CreateServiceButton canCreateMore={true} />
         </div>
 
         <Card>
@@ -115,12 +111,7 @@ export default async function ServicesPage({
             </p>
           )}
         </div>
-        <Button asChild>
-          <NextLink href='/dashboard/services/create'>
-            <Plus className='w-4 h-4 mr-2' />
-            Νέα Υπηρεσία
-          </NextLink>
-        </Button>
+        <CreateServiceButton canCreateMore={services.canCreateMore} />
       </div>
 
       {/* Services Table */}
@@ -167,6 +158,7 @@ export default async function ServicesPage({
               order: filters.sortOrder || 'desc',
             }}
             canFeatureMore={services.canFeatureMore}
+            canCreateMore={services.canCreateMore}
           />
 
           {/* Pagination */}

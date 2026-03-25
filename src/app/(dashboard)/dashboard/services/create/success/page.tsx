@@ -7,6 +7,8 @@ import { Check, Plus, Settings } from 'lucide-react';
 import { getCurrentUser } from '@/actions/auth/server';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import { NextLink } from '@/components';
+import { canCreateService } from '@/lib/subscription/feature-gate';
+import CreateServiceButton from '@/components/dashboard/services/create-service-button';
 
 export const metadata = getDashboardMetadata('Επιτυχής Δημιουργία Υπηρεσίας');
 
@@ -36,6 +38,11 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
   if (!serviceId || !serviceTitle) {
     redirect('/dashboard/services/create');
   }
+
+  const { profile } = userResult.data;
+  const canCreateMore = profile?.id
+    ? await canCreateService(profile.id)
+    : true;
 
   return (
     <div className='max-w-5xl mx-auto p-6'>
@@ -81,19 +88,13 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
 
             {/* Action Buttons */}
             <div className='flex flex-col sm:flex-row gap-3 justify-center items-center'>
-              <Button
-                asChild
-                size='lg'
-                className='bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 px-6'
+              <CreateServiceButton
+                canCreateMore={canCreateMore}
+                className='bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 px-6 h-10'
               >
-                <NextLink
-                  href='/dashboard/services/create'
-                  className='flex items-center gap-2'
-                >
-                  <Plus className='w-4 h-4' />
-                  Δημιουργία Νέας Υπηρεσίας
-                </NextLink>
-              </Button>
+                <Plus className='w-4 h-4' />
+                Δημιουργία Νέας Υπηρεσίας
+              </CreateServiceButton>
 
               <Button
                 asChild

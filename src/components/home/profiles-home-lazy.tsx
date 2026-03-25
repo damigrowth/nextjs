@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { ProfilesHomeSkeleton } from './profiles-home-skeleton';
-import type { ProfileCardData } from '@/lib/types/components';
+import type { ArchiveProfileCardData } from '@/lib/types/components';
 
 // Lazy load the profiles section wrapper
 const ProfilesHomeWrapper = dynamic(
@@ -14,7 +14,7 @@ const ProfilesHomeWrapper = dynamic(
 );
 
 interface ProfilesHomeLazyProps {
-  profiles: ProfileCardData[];
+  profiles: ArchiveProfileCardData[];
 }
 
 export function ProfilesHomeLazy({ profiles }: ProfilesHomeLazyProps) {

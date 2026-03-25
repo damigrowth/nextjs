@@ -25,6 +25,7 @@ export interface DynamicBreadcrumbProps {
     saveType?: string;
     hideSaveButton?: boolean;
     isAuthenticated?: boolean;
+    isOwner?: boolean;
   };
   className?: string;
 }

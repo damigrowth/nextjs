@@ -100,7 +100,10 @@ export default function UpgradeToProForm({
       toast.success(state.message, { id: 'upgrade-to-pro-success' });
 
       // Hard redirect to onboarding — ensures full page load with fresh session
-      window.location.href = '/onboarding';
+      // Use setTimeout to ensure the toast is shown before navigation
+      setTimeout(() => {
+        window.location.href = '/onboarding';
+      }, 100);
     } else if (!state.success && state.message) {
       toast.error(state.message, { id: 'upgrade-to-pro-error' });
     }
@@ -108,12 +111,12 @@ export default function UpgradeToProForm({
     if (!state.success) {
       toastShownRef.current = false;
     }
-  }, [state]);
+  }, [state.success, state.message]);
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Αλλαγή σε Επαγγελματικό λογαριασμό</DialogTitle>
+        <DialogTitle>Αλλαγή σε Επαγγελματικό Προφίλ</DialogTitle>
         <DialogDescription>
           Αναβαθμίστε τον λογαριασμό σας σε επαγγελματικό για να προσφέρετε
           υπηρεσίες στην πλατφόρμα.

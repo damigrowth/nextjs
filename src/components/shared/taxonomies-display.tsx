@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface TaxonomiesDisplayProps {
@@ -10,12 +11,14 @@ interface TaxonomiesDisplayProps {
   };
   className?: string;
   compact?: boolean;
+  variant?: 'text' | 'badge';
 }
 
 export default function TaxonomiesDisplay({
   taxonomyLabels,
   className,
   compact = false,
+  variant = 'text',
 }: TaxonomiesDisplayProps) {
   // Handle undefined taxonomyLabels
   if (!taxonomyLabels) {
@@ -38,6 +41,14 @@ export default function TaxonomiesDisplay({
       <span className={cn('text-gray-500 text-sm italic', className)}>
         Χωρίς κατηγορία
       </span>
+    );
+  }
+
+  if (variant === 'badge') {
+    return (
+      <Badge variant='muted' className={cn('font-normal', className)}>
+        {hierarchy.join(' - ')}
+      </Badge>
     );
   }
 

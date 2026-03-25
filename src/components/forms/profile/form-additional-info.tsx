@@ -16,14 +16,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Selectbox } from '@/components/ui/selectbox';
 import { toast } from 'sonner';
 
 // Custom components
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Currency } from '@/components/ui/currency';
-import YearPicker from '@/components/ui/year-picker';
+import YearSelect from '@/components/ui/year-select';
 
 // Icons (lucide-react only)
 import { Loader2 } from 'lucide-react';
@@ -39,8 +38,6 @@ import {
   settlementMethodsOptions,
   budgetOptions,
 } from '@/constants/datasets/options';
-import { industriesOptions as industriesDataset } from '@/constants/datasets/industries';
-
 // Validation schema and server actions
 import {
   profileAdditionalInfoUpdateSchema,
@@ -93,7 +90,6 @@ export default function AdditionalInfoForm({
       paymentMethods: [],
       settlementMethods: [],
       budget: '',
-      industries: [],
       terms: '',
     },
     mode: 'onChange', // Real-time validation
@@ -117,7 +113,6 @@ export default function AdditionalInfoForm({
         paymentMethods: profile.paymentMethods || [],
         settlementMethods: profile.settlementMethods || [],
         budget: profile.budget || '',
-        industries: profile.industries || [],
         terms: profile.terms || '',
       };
       form.reset(resetData);
@@ -150,7 +145,6 @@ export default function AdditionalInfoForm({
         'contactMethods',
         'paymentMethods',
         'settlementMethods',
-        'industries',
       ], // Arrays that need JSON.stringify
       skipEmpty: true, // Skip null/undefined/empty values
     });
@@ -176,45 +170,30 @@ export default function AdditionalInfoForm({
             : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'
         }
       >
-        {/* Row 1: Three columns of checkbox methods */}
+        {/* Row 1: Three columns of method selectors */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           {/* Contact Methods */}
           <FormField
             control={form.control}
             name='contactMethods'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='space-y-2 flex flex-col'>
                 <FormLabel>Μέθοδοι Επικοινωνίας</FormLabel>
                 <FormControl>
-                  <div className='space-y-3'>
-                    {contactMethodsOptions.map((method) => (
-                      <div
-                        key={method.id}
-                        className='flex items-center space-x-2'
-                      >
-                        <Checkbox
-                          id={`contact-${method.id}`}
-                          checked={field.value?.includes(method.id) || false}
-                          onCheckedChange={(checked) => {
-                            const currentValues = field.value || [];
-                            const newValues = checked
-                              ? [...currentValues, method.id]
-                              : currentValues.filter((id) => id !== method.id);
-                            setValue('contactMethods', newValues, {
-                              shouldDirty: true,
-                              // shouldValidate: true,
-                            });
-                          }}
-                        />
-                        <FormLabel
-                          htmlFor={`contact-${method.id}`}
-                          className='text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                        >
-                          {method.label}
-                        </FormLabel>
-                      </div>
-                    ))}
-                  </div>
+                  <LazyCombobox
+                    multiple
+                    options={contactMethodsOptions}
+                    values={field.value || []}
+                    onMultiSelect={(selectedOptions) => {
+                      const selectedIds = selectedOptions.map((opt) => opt.id);
+                      setValue('contactMethods', selectedIds, {
+                        shouldDirty: true,
+                      });
+                    }}
+                    onSelect={() => {}}
+                    placeholder='Επιλέξτε μεθόδους...'
+                    searchPlaceholder='Αναζήτηση...'
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -226,38 +205,23 @@ export default function AdditionalInfoForm({
             control={form.control}
             name='paymentMethods'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='space-y-2 flex flex-col'>
                 <FormLabel>Μέθοδοι Πληρωμής</FormLabel>
                 <FormControl>
-                  <div className='space-y-3'>
-                    {paymentMethodsOptions.map((method) => (
-                      <div
-                        key={method.id}
-                        className='flex items-center space-x-2'
-                      >
-                        <Checkbox
-                          id={`payment-${method.id}`}
-                          checked={field.value?.includes(method.id) || false}
-                          onCheckedChange={(checked) => {
-                            const currentValues = field.value || [];
-                            const newValues = checked
-                              ? [...currentValues, method.id]
-                              : currentValues.filter((id) => id !== method.id);
-                            setValue('paymentMethods', newValues, {
-                              shouldDirty: true,
-                              // shouldValidate: true,
-                            });
-                          }}
-                        />
-                        <label
-                          htmlFor={`payment-${method.id}`}
-                          className='text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                        >
-                          {method.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <LazyCombobox
+                    multiple
+                    options={paymentMethodsOptions}
+                    values={field.value || []}
+                    onMultiSelect={(selectedOptions) => {
+                      const selectedIds = selectedOptions.map((opt) => opt.id);
+                      setValue('paymentMethods', selectedIds, {
+                        shouldDirty: true,
+                      });
+                    }}
+                    onSelect={() => {}}
+                    placeholder='Επιλέξτε μεθόδους...'
+                    searchPlaceholder='Αναζήτηση...'
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -269,38 +233,23 @@ export default function AdditionalInfoForm({
             control={form.control}
             name='settlementMethods'
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Μέθοδοι Διακανονισμού</FormLabel>
+              <FormItem className='space-y-2 flex flex-col'>
+                <FormLabel>Μέθοδοι Εξόφλησης</FormLabel>
                 <FormControl>
-                  <div className='space-y-3'>
-                    {settlementMethodsOptions.map((method) => (
-                      <div
-                        key={method.id}
-                        className='flex items-center space-x-2'
-                      >
-                        <Checkbox
-                          id={`settlement-${method.id}`}
-                          checked={field.value?.includes(method.id) || false}
-                          onCheckedChange={(checked) => {
-                            const currentValues = field.value || [];
-                            const newValues = checked
-                              ? [...currentValues, method.id]
-                              : currentValues.filter((id) => id !== method.id);
-                            setValue('settlementMethods', newValues, {
-                              shouldDirty: true,
-                              // shouldValidate: true,
-                            });
-                          }}
-                        />
-                        <label
-                          htmlFor={`settlement-${method.id}`}
-                          className='text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                        >
-                          {method.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <LazyCombobox
+                    multiple
+                    options={settlementMethodsOptions}
+                    values={field.value || []}
+                    onMultiSelect={(selectedOptions) => {
+                      const selectedIds = selectedOptions.map((opt) => opt.id);
+                      setValue('settlementMethods', selectedIds, {
+                        shouldDirty: true,
+                      });
+                    }}
+                    onSelect={() => {}}
+                    placeholder='Επιλέξτε μεθόδους...'
+                    searchPlaceholder='Αναζήτηση...'
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -318,7 +267,7 @@ export default function AdditionalInfoForm({
               <FormItem className='space-y-2 flex flex-col'>
                 <FormLabel>Έναρξη Δραστηριότητας</FormLabel>
                 <FormControl>
-                  <YearPicker
+                  <YearSelect
                     value={field.value}
                     onValueChange={field.onChange}
                     placeholder='π.χ. 2020'
@@ -383,34 +332,7 @@ export default function AdditionalInfoForm({
           />
         </div>
 
-        {/* Row 3: Industries (full width) */}
-        <FormField
-          control={form.control}
-          name='industries'
-          render={({ field }) => (
-            <FormItem className='space-y-2 flex flex-col'>
-              <FormLabel>Κλάδοι Δραστηριότητας</FormLabel>
-              <FormControl>
-                <LazyCombobox
-                  multiple
-                  options={industriesDataset}
-                  values={field.value || []}
-                  onMultiSelect={(selectedOptions) => {
-                    const selectedIds = selectedOptions.map((opt) => opt.id);
-                    field.onChange(selectedIds);
-                  }}
-                  onSelect={() => {}} // Required but not used in multi mode
-                  placeholder='Επιλέξτε κλάδους...'
-                  searchPlaceholder='Αναζήτηση κλάδων...'
-                  maxItems={10}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Row 4: Terms (full width) */}
+        {/* Row 3: Terms (full width) */}
         <FormField
           control={form.control}
           name='terms'

@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma/client';
 import { getServiceTaxonomies } from '@/lib/taxonomies';
 // Complex utilities - KEEP for hierarchy resolution
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
-import { canFeatureService } from '@/lib/subscription/feature-gate';
+import { canFeatureService, canCreateService } from '@/lib/subscription/feature-gate';
 import type { ActionResult } from '@/lib/types/api';
 import type { Prisma, Status } from '@prisma/client';
 
@@ -163,8 +163,11 @@ export async function getUserServices(
     const transformedServices = services.map(transformServiceForTable);
     const totalPages = Math.ceil(total / limit);
 
-    // Check if user can feature more services
-    const canFeatureMoreServices = await canFeatureService(profile.id);
+    // Check plan limits for feature and create gates (parallel)
+    const [canFeatureMoreServices, canCreateMoreServices] = await Promise.all([
+      canFeatureService(profile.id),
+      canCreateService(profile.id),
+    ]);
 
     return {
       success: true,
@@ -175,6 +178,7 @@ export async function getUserServices(
         limit,
         totalPages,
         canFeatureMore: canFeatureMoreServices,
+        canCreateMore: canCreateMoreServices,
       },
     };
   } catch (error) {

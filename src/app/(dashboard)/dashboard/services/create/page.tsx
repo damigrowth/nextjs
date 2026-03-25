@@ -6,6 +6,8 @@ import { getDashboardMetadata } from '@/lib/seo/pages';
 import { getServiceTaxonomies, getTags } from '@/lib/taxonomies';
 import { getAllSubdivisions } from '@/lib/utils/datasets';
 import { getUserTaxonomySubmissions } from '@/actions/taxonomy-submission';
+import { canCreateService } from '@/lib/subscription/feature-gate';
+import ServiceLimitSheet from '@/components/dashboard/services/service-limit-sheet';
 
 export const metadata = getDashboardMetadata('Δημιουργία Υπηρεσίας');
 
@@ -22,6 +24,15 @@ export default async function CreateServicePage() {
   // Check if user can create services (only professionals)
   if (user.role !== 'freelancer' && user.role !== 'company') {
     redirect('/dashboard');
+  }
+
+  // Check service limit — show upgrade sheet instead of form when at max
+  const canCreate = profile?.id
+    ? await canCreateService(profile.id)
+    : true;
+
+  if (!canCreate) {
+    return <ServiceLimitSheet />;
   }
 
   // Prepare taxonomy data server-side to prevent client-side bundle bloat

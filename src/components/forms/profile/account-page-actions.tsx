@@ -67,7 +67,7 @@ export default function AccountPageActions({ user }: AccountPageActionsProps) {
           <DialogTrigger asChild>
             <Button variant='outline' className='flex items-center gap-2'>
               <ArrowUpCircle className='h-4 w-4' />
-              Αλλαγή σε Επαγγελματικό λογαριασμό
+              Αλλαγή σε Επαγγελματικό Προφίλ
             </Button>
           </DialogTrigger>
           <DialogContent className='sm:max-w-md'>

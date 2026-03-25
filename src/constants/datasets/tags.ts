@@ -1,4 +1,4 @@
-// Generated on 2026-03-11T09:35:19.248Z
+// Generated on 2026-03-19T17:42:14.237Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
@@ -6380,7 +6380,7 @@ export const tags = [
   {
     id: '1312',
     label: 'Ραντεβού',
-    slug: '',
+    slug: 'rantevou',
   },
   {
     id: '1313',
@@ -6390,11 +6390,106 @@ export const tags = [
   {
     id: '1314',
     label: 'Ανάλυση SEO',
-    slug: '-seo',
+    slug: 'analusi-seo',
   },
   {
     id: '1315',
+    label: 'Κάτοψη',
+    slug: 'katopsi',
+  },
+  {
+    id: '1316',
+    label: 'UGC',
+    slug: 'ugc',
+  },
+  {
+    id: '1318',
+    label: 'dwg',
+    slug: 'dwg',
+  },
+  {
+    id: '1319',
+    label: '2D Design',
+    slug: '2d-design',
+  },
+  {
+    id: '1320',
+    label: 'Floor Plan',
+    slug: 'floor-plan',
+  },
+  {
+    id: '1321',
+    label: 'consulting',
+    slug: 'consulting',
+  },
+  {
+    id: '1322',
+    label: 'marketing consulting',
+    slug: 'marketing-consulting',
+  },
+  {
+    id: '1323',
+    label: 'Poster',
+    slug: 'poster',
+  },
+  {
+    id: '1324',
+    label: 'Εκπόνηση Εργασιών',
+    slug: 'ekponisi-ergasion',
+  },
+  {
+    id: '1325',
     label: 'Υποστήριξη εργασιών',
-    slug: '-',
+    slug: 'upostirixi-ergasion',
+  },
+  {
+    id: '1326',
+    label: 'Εργασίες',
+    slug: 'ergasies',
+  },
+  {
+    id: '1327',
+    label: 'Καθαρισμοί οικοπέδων',
+    slug: 'katharismoi-oikopedon',
+  },
+  {
+    id: '1328',
+    label: 'product review',
+    slug: 'product-review',
+  },
+  {
+    id: '1329',
+    label: 'vlog',
+    slug: 'vlog',
+  },
+  {
+    id: '1330',
+    label: 'content creator',
+    slug: 'content-creator',
+  },
+  {
+    id: '1331',
+    label: 'Άρση Βαρών',
+    slug: 'arsi-varon',
+  },
+  {
+    id: '1332',
+    label: 'Προπόνηση Δύναμης',
+    slug: 'proponisi-dunamis',
+  },
+  {
+    id: '1333',
+    label: 'Στίβος',
+    slug: 'stivos',
+  },
+  {
+    id: '1334',
+    label: 'Functional Training',
+    slug: 'functional-training',
+  },
+  {
+    id: '1335',
+    label: 'Cross Training',
+    slug: 'cross-training',
   },
 ];

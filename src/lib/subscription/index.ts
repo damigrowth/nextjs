@@ -1,7 +1,7 @@
 export {
   getActivePlan,
   getPlanLimits,
-  canPublishService,
+  canCreateService,
   canFeatureService,
   hasAutoRefresh,
   getRemainingFeaturedSlots,

@@ -9,22 +9,16 @@ import {
 } from '@/components/ui/carousel';
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
 import { NextLink } from '@/components';
-import { ProfileCard } from '@/components/shared/profile-card';
-import { ProfileCardData } from '@/lib/types';
+import { ArchiveProfileCard } from '@/components/archives/archive-profile-card';
+import type { ArchiveProfileCardData } from '@/lib/types/components';
 
 interface ProfilesHomeProps {
-  profiles: ProfileCardData[];
-  savedProfileIds?: string[];
+  profiles: ArchiveProfileCardData[];
 }
 
 export default function ProfilesHome({
   profiles,
-  savedProfileIds,
 }: ProfilesHomeProps) {
-  // Convert array to Set for O(1) lookups
-  const savedIdsSet = savedProfileIds
-    ? new Set(savedProfileIds)
-    : new Set<string>();
   return (
     <section className='py-8 sm:py-12 md:py-16 bg-dark overflow-hidden'>
       <div className='container mx-auto px-4 sm:px-6'>
@@ -68,9 +62,9 @@ export default function ProfilesHome({
                   key={profile.id}
                   className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4 cursor-pointer'
                 >
-                  <ProfileCard
+                  <ArchiveProfileCard
                     profile={profile}
-                    isSaved={savedIdsSet.has(profile.id)}
+                    variant='vertical'
                   />
                 </CarouselItem>
               ))}

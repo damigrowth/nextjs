@@ -13,6 +13,7 @@ import {
   findAllSubcategoriesBySlug,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
+import { getCountiesForArchiveFilters, NATIONWIDE_ID } from '@/lib/utils/datasets';
 import type { DatasetItem } from '@/lib/types/datasets';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
@@ -149,6 +150,13 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
                   array_contains: countyId,
                 },
               },
+              // Nationwide (Πανελλαδικά) pros
+              {
+                coverage: {
+                  path: ['counties'],
+                  array_contains: NATIONWIDE_ID,
+                },
+              },
             ],
           },
         ];
@@ -170,7 +178,7 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       const countyId = resolveToCountyId(filters.county);
 
       if (countyId) {
-        // Check both single county and counties array
+        // Check both single county, counties array, and nationwide
         whereClause.OR = [
           // Single county field (for onbase location)
           {
@@ -184,6 +192,13 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
             coverage: {
               path: ['counties'],
               array_contains: countyId,
+            },
+          },
+          // Nationwide (Πανελλαδικά) pros
+          {
+            coverage: {
+              path: ['counties'],
+              array_contains: NATIONWIDE_ID,
             },
           },
         ];
@@ -304,6 +319,7 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
 
         return {
           id: profile.id,
+          uid: profile.uid,
           username: profile.username,
           displayName: profile.displayName,
           rating: profile.rating,
@@ -653,6 +669,7 @@ export async function getProfileArchivePageData(params: {
                 OR: [
                   { coverage: { path: ['county'], equals: countyId } },
                   { coverage: { path: ['counties'], array_contains: countyId } },
+                  { coverage: { path: ['counties'], array_contains: NATIONWIDE_ID } },
                 ],
               },
             ];
@@ -668,6 +685,7 @@ export async function getProfileArchivePageData(params: {
             countWhere.OR = [
               { coverage: { path: ['county'], equals: countyId } },
               { coverage: { path: ['counties'], array_contains: countyId } },
+              { coverage: { path: ['counties'], array_contains: NATIONWIDE_ID } },
             ];
           }
         }
@@ -710,8 +728,8 @@ export async function getProfileArchivePageData(params: {
       }
     }
 
-    // Prepare county options
-    const counties = locationOptions.map((location) => ({
+    // Prepare county options (ordered, without Πανελλαδικά)
+    const counties = getCountiesForArchiveFilters(locationOptions).map((location) => ({
       id: location.id,
       label: location.name,
       name: location.name,

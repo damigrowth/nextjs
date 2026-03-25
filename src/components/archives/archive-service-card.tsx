@@ -1,5 +1,4 @@
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
 import type { ServiceCardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -8,8 +7,10 @@ import { NextLink } from '@/components';
 import ProfileBadges from '@/components/shared/profile-badges';
 import RatingDisplay from '@/components/shared/rating-display';
 import UserAvatar from '@/components/shared/user-avatar';
+import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import { CoverageDisplay } from './coverage-display';
 import { MediaTypeIndicators } from '@/components/shared/media-type-indicators';
+import SaveButton from '@/components/shared/save-button';
 
 interface ArchiveServiceCardProps {
   service: ArchiveServiceCardData | ServiceCardData;
@@ -60,10 +61,15 @@ export function ArchiveServiceCard({
   return (
     <Card
       className={cn(
-        'hover:shadow-md transition-shadow duration-200 overflow-hidden',
+        'group relative hover:shadow-md transition-shadow duration-200 overflow-hidden',
         className,
       )}
     >
+      {/* Save Button - appears on hover */}
+      <div className='absolute top-3 right-3 z-20'>
+        <SaveButton itemType='service' itemId={service.id} ownerId={service.profile.uid} />
+      </div>
+
       <div className='flex flex-col md:flex-row h-full md:h-52'>
         {/* Profile Image Section - Left side */}
         <NextLink
@@ -104,13 +110,14 @@ export function ArchiveServiceCard({
             </NextLink>
 
             {/* Category Display */}
-            {(categoryLabel || subcategoryLabel) && (
-              <Badge variant='muted' className='font-normal'>
-                {categoryLabel && subcategoryLabel
-                  ? `${categoryLabel} - ${subcategoryLabel}`
-                  : categoryLabel || subcategoryLabel}
-              </Badge>
-            )}
+            <TaxonomiesDisplay
+              taxonomyLabels={{
+                category: '',
+                subcategory: categoryLabel || '',
+                subdivision: subcategoryLabel || '',
+              }}
+              variant='badge'
+            />
           </div>
 
           {/* Bottom Section */}

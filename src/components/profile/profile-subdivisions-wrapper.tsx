@@ -20,7 +20,7 @@ export default function ProfileSubdivisionsWrapper({
   };
 
   return (
-    <div onClick={handleClick} className='sm:col-span-2'>
+    <div onClick={handleClick}>
       {children}
     </div>
   );

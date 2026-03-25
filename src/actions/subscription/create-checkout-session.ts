@@ -7,6 +7,7 @@ import { createCheckoutSessionSchema } from '@/lib/validations/subscription';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { ProviderNotConfiguredError, ProviderOperationError } from '@/lib/payment';
+import { findCoupon } from '@/lib/payment/coupons';
 import type { ActionResult } from '@/lib/types/api';
 
 /**
@@ -15,7 +16,7 @@ import type { ActionResult } from '@/lib/types/api';
  * Returns the checkout session URL to redirect to.
  */
 export async function createCheckoutSession(
-  input: { billingInterval: BillingInterval },
+  input: { billingInterval: BillingInterval; couponCode?: string },
 ): Promise<ActionResult<{ url: string }>> {
   try {
     const session = await requireAuth();
@@ -32,7 +33,18 @@ export async function createCheckoutSession(
       return { success: false, error: 'Μη έγκυρα δεδομένα' };
     }
 
-    const { plan, billingInterval } = parsed.data;
+    const { plan, billingInterval, couponCode } = parsed.data;
+
+    // Validate coupon server-side if provided
+    if (couponCode) {
+      const coupon = findCoupon(couponCode);
+      if (!coupon) {
+        return { success: false, error: 'Μη έγκυρο κουπόνι' };
+      }
+      if (!coupon.applicableIntervals.includes(billingInterval)) {
+        return { success: false, error: 'Το κουπόνι ισχύει μόνο για ετήσια συνδρομή' };
+      }
+    }
 
     const profile = await prisma.profile.findUnique({
       where: { uid: user.id },
@@ -102,6 +114,7 @@ export async function createCheckoutSession(
         // If invoice selected, this is a business purchase
         isBusinessPurchase,
       },
+      couponCode: couponCode || undefined,
     });
 
 

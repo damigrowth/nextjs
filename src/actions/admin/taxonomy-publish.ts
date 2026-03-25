@@ -29,6 +29,22 @@ import {
 import type { DatasetItem } from '@/lib/types/datasets';
 import { sanitizeDrafts, mergeDraftOperations } from '@/lib/validations/taxonomy-drafts';
 import { isSuccess } from '@/lib/types/server-actions';
+import { prisma } from '@/lib/prisma/client';
+import { revalidateAllCaches } from './revalidate-caches';
+
+/**
+ * Map granular TaxonomyType to the underlying file type.
+ * Multiple TaxonomyType values share the same file:
+ *   service-categories, service-subcategories, service-subdivisions → 'service'
+ *   pro-categories, pro-subcategories → 'pro'
+ *   tags → 'tags'
+ *   skills → 'skills'
+ */
+function getFileType(type: TaxonomyType): string {
+  if (type.startsWith('service-')) return 'service';
+  if (type.startsWith('pro-')) return 'pro';
+  return type; // 'tags' | 'skills' are 1:1
+}
 
 /**
  * Collect all existing IDs from taxonomy tree (for collision detection)
@@ -177,6 +193,13 @@ function moveAndUpdateItem(
   newParentId: string,
   level?: string | null
 ): DatasetItem[] {
+  // SAFETY: level must be set for move operations
+  if (!level || (level !== 'subcategory' && level !== 'subdivision')) {
+    throw new Error(
+      `Move operation requires a valid level ("subcategory" or "subdivision"), got: "${level}"`
+    );
+  }
+
   // Find existing item to preserve children
   const existingItem = findItemInTree(data, itemId);
   if (!existingItem) {
@@ -344,6 +367,50 @@ function createOverallCommitMessage(
 }
 
 /**
+ * After a subdivision move, update all services in the database
+ * that reference the moved item so their subcategory points to the new parent.
+ *
+ * For subcategory moves, update the category field on affected services.
+ */
+async function syncServicesAfterMove(
+  drafts: TaxonomyDraft[]
+): Promise<void> {
+  for (const draft of drafts) {
+    if (!isUpdateDraft(draft) || !draft.newParentId || !draft.level) continue;
+
+    if (draft.level === 'subdivision') {
+      // Subdivision moved to a new subcategory
+      // Update all services that reference this subdivision
+      const result = await prisma.service.updateMany({
+        where: { subdivision: draft.itemId },
+        data: { subcategory: draft.newParentId },
+      });
+
+      if (result.count > 0) {
+        console.log(
+          `[PUBLISH] Updated ${result.count} services: subdivision "${draft.itemId}" → new subcategory "${draft.newParentId}"`
+        );
+        await revalidateAllCaches();
+      }
+    } else if (draft.level === 'subcategory') {
+      // Subcategory moved to a new category
+      // Update all services that reference this subcategory
+      const result = await prisma.service.updateMany({
+        where: { subcategory: draft.itemId },
+        data: { category: draft.newParentId },
+      });
+
+      if (result.count > 0) {
+        console.log(
+          `[PUBLISH] Updated ${result.count} services: subcategory "${draft.itemId}" → new category "${draft.newParentId}"`
+        );
+        await revalidateAllCaches();
+      }
+    }
+  }
+}
+
+/**
  * Publish all pending changes from localStorage
  *
  * Process:
@@ -353,6 +420,7 @@ function createOverallCommitMessage(
  * 4. For each type: apply drafts and commit
  * 5. Create/update PR
  * 6. Auto-merge PR
+ * 7. Sync database services for any move operations
  *
  * @param draftsRaw - All drafts from localStorage (sent by client)
  */
@@ -394,16 +462,18 @@ export async function publishAllChanges(
       'operations'
     );
 
-    // Group drafts by taxonomy type
-    const grouped = new Map<TaxonomyType, TaxonomyDraft[]>();
+    // Group drafts by underlying FILE TYPE (not TaxonomyType)
+    // This prevents multiple types that share a file from clobbering each other
+    const groupedByFile = new Map<string, TaxonomyDraft[]>();
 
     for (const draft of optimizedDrafts) {
-      const existing = grouped.get(draft.taxonomyType) || [];
+      const fileType = getFileType(draft.taxonomyType);
+      const existing = groupedByFile.get(fileType) || [];
       existing.push(draft);
-      grouped.set(draft.taxonomyType, existing);
+      groupedByFile.set(fileType, existing);
     }
 
-    console.log('[PUBLISH] Grouped into', grouped.size, 'taxonomy types');
+    console.log('[PUBLISH] Grouped into', groupedByFile.size, 'file types');
 
     // Collect all changes for batch commit
     const allChanges: Array<{
@@ -412,28 +482,45 @@ export async function publishAllChanges(
       individualMessage: string;
     }> = [];
 
-    // Process each taxonomy type and prepare changes
-    for (const [type, typeDrafts] of grouped) {
-      console.log(`[PUBLISH] Processing ${type}: ${typeDrafts.length} changes`);
+    // Process each FILE TYPE: read once, apply ALL drafts, write once
+    for (const [fileType, fileDrafts] of groupedByFile) {
+      // Use any TaxonomyType from this group to read the file
+      // (they all map to the same file)
+      const representativeType = fileDrafts[0].taxonomyType;
 
-      // Read current data from Git
-      const dataResult = await getTaxonomyData(type);
-
-      if (!isSuccess(dataResult)) {
-        throw new Error(`Failed to read ${type}: ${dataResult.error.message}`);
+      // Collect per-TaxonomyType draft lists for commit message
+      const byType = new Map<TaxonomyType, TaxonomyDraft[]>();
+      for (const draft of fileDrafts) {
+        const list = byType.get(draft.taxonomyType) || [];
+        list.push(draft);
+        byType.set(draft.taxonomyType, list);
       }
 
-      // Apply all drafts for this type
-      const updatedData = applyDraftsToData(dataResult.data, typeDrafts);
+      const typeNames = [...byType.keys()].join(', ');
+      console.log(`[PUBLISH] Processing file "${fileType}" (${typeNames}): ${fileDrafts.length} total changes`);
 
-      // Create individual commit message for this type
-      const message = createCommitMessage(type, typeDrafts);
+      // Read current data from Git ONCE for this file
+      const dataResult = await getTaxonomyData(representativeType);
 
-      // Add to batch
+      if (!isSuccess(dataResult)) {
+        throw new Error(`Failed to read ${representativeType}: ${dataResult.error.message}`);
+      }
+
+      // Apply ALL drafts for this file sequentially
+      const updatedData = applyDraftsToData(dataResult.data, fileDrafts);
+
+      // Build commit message listing all affected TaxonomyTypes
+      const messageParts: string[] = [];
+      for (const [type, typeDrafts] of byType) {
+        messageParts.push(createCommitMessage(type, typeDrafts));
+      }
+      const combinedMessage = messageParts.join('\n');
+
+      // Add ONE entry per file (using representative type for file path resolution)
       allChanges.push({
-        type,
+        type: representativeType,
         data: updatedData,
-        individualMessage: message,
+        individualMessage: combinedMessage,
       });
     }
 
@@ -450,6 +537,9 @@ export async function publishAllChanges(
     }
 
     console.log('[PUBLISH] Successfully published single commit:', commitResult.commitSha);
+
+    // Sync database services for any move operations
+    await syncServicesAfterMove(optimizedDrafts);
 
     return {
       success: true,

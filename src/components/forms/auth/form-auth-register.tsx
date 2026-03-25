@@ -72,7 +72,11 @@ const consentOptions = [
   },
 ];
 
-const initialState = {
+const initialState: {
+  success: boolean;
+  message: string;
+  errors?: Record<string, string[]>;
+} = {
   success: false,
   message: '',
 };
@@ -125,6 +129,18 @@ export default function RegisterForm() {
   }, []); // Empty dependency array - only run once on mount
 
   // Note: Redirect is now handled server-side in register
+
+  // Map server-side validation errors back to form fields
+  useEffect(() => {
+    if (!state.success && state.errors) {
+      const fieldErrors = state.errors as Record<string, string[]>;
+      Object.entries(fieldErrors).forEach(([field, messages]) => {
+        if (messages?.length) {
+          setError(field as any, { message: messages[0] });
+        }
+      });
+    }
+  }, [state, setError]);
 
   // Handle form submission
   const handleFormSubmit = async (formData: FormData) => {

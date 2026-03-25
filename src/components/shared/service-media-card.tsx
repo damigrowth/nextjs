@@ -70,17 +70,14 @@ export function ServiceMediaCard({
             </NextLink>
 
             {/* Category Display */}
-            {service.category && (
-              <TaxonomiesDisplay
-                taxonomyLabels={{
-                  category: service.category,
-                  subcategory: '',
-                  subdivision: '',
-                }}
-                compact
-                className='text-sm'
-              />
-            )}
+            <TaxonomiesDisplay
+              taxonomyLabels={{
+                category: '',
+                subcategory: service.taxonomyLabels?.subcategory || service.category || '',
+                subdivision: service.taxonomyLabels?.subdivision || '',
+              }}
+              variant='badge'
+            />
           </div>
 
           {/* Bottom Section */}
@@ -88,16 +85,18 @@ export function ServiceMediaCard({
             {/* Bottom bar with price (left) and media icons (right) */}
             <div className='flex items-center gap-3 border-t border-gray-200 pt-3'>
               {/* Price */}
-              {hasValidPrice && (
-                <div className='flex-1'>
-                  <span className='font-normal text-body'>από </span>
-                  <span className='font-semibold text-dark text-lg'>
-                    {priceValue}€
-                  </span>
-                </div>
-              )}
+              <div className='flex-1'>
+                {hasValidPrice && (
+                  <>
+                    <span className='font-normal text-body'>από </span>
+                    <span className='font-semibold text-dark text-lg'>
+                      {priceValue}€
+                    </span>
+                  </>
+                )}
+              </div>
 
-              {/* Media Type Indicators */}
+              {/* Media Type Indicators - always on the right */}
               <MediaTypeIndicators media={service.media} />
             </div>
           </div>

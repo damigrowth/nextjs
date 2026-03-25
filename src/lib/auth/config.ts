@@ -459,7 +459,7 @@ export const auth = betterAuth({
     username({
       minUsernameLength: 3,
       maxUsernameLength: 30,
-      usernameValidator: (username) => /^[a-zA-Z0-9_]+$/.test(username),
+      usernameValidator: (username) => /^[a-zA-Z0-9_-]+$/.test(username),
     }),
     admin({
       defaultRole: 'user',
