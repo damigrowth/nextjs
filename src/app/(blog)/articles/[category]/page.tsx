@@ -6,10 +6,9 @@ import {
   getBlogCategoryBySlug,
 } from '@/constants/datasets/blog-categories';
 import {
-  ArticleCard,
   BlogCategoryTabs,
   BlogPagination,
-  FeaturedArticleHero,
+  HorizontalArticleCard,
   CompactArticleRow,
 } from '@/components/blog';
 
@@ -73,29 +72,25 @@ export default async function CategoryPage({
     ? articlesResult.data!.totalPages
     : 0;
 
-  const featuredArticle =
-    currentPage === 1 ? allArticles.find((a) => a.featured) : null;
-  const remainingArticles = featuredArticle
-    ? allArticles.filter((a) => a.id !== featuredArticle.id)
-    : allArticles;
-  const gridArticles = remainingArticles.slice(0, 6);
-  const recentArticles = currentPage === 1 ? remainingArticles.slice(6) : [];
+  // Page 1: first 3 as horizontal featured cards, rest as compact list
+  const featuredCards = currentPage === 1 ? allArticles.slice(0, 3) : [];
+  const compactArticles = currentPage === 1 ? allArticles.slice(3) : allArticles;
 
   return (
-    <div className="py-16 md:py-24 bg-white">
+    <div className="py-20 bg-white">
       <div className="max-w-5xl mx-auto px-4 lg:px-6">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-3">
+        <div className="mt-4 mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
             {category.label}
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             {category.description || `Άρθρα στην κατηγορία ${category.label}`}
           </p>
         </div>
 
         {/* Category Tabs */}
-        <div className="mb-10">
+        <div className="mb-8">
           <BlogCategoryTabs
             categories={categories}
             currentSlug={categorySlug}
@@ -114,30 +109,26 @@ export default async function CategoryPage({
           </div>
         ) : (
           <>
-            {/* Featured Hero (page 1 only) */}
-            {currentPage === 1 && featuredArticle && (
-              <div className="mb-12">
-                <FeaturedArticleHero article={featuredArticle} />
-              </div>
-            )}
-
-            {/* Articles Grid */}
-            {gridArticles.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gridArticles.map((article) => (
-                  <ArticleCard key={article.id} article={article} />
+            {/* Horizontal Featured Cards (page 1 only) */}
+            {featuredCards.length > 0 && (
+              <div>
+                {featuredCards.map((article) => (
+                  <HorizontalArticleCard key={article.id} article={article} />
                 ))}
               </div>
             )}
 
-            {/* Compact Recent List (page 1 only) */}
-            {currentPage === 1 && recentArticles.length > 0 && (
-              <div className="mt-12">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  Πρόσφατα Άρθρα
-                </h2>
+            {/* Compact List */}
+            {compactArticles.length > 0 && (
+              <div className="mt-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-muted-foreground">•</span>
+                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Πρόσφατα
+                  </h2>
+                </div>
                 <div>
-                  {recentArticles.map((article) => (
+                  {compactArticles.map((article) => (
                     <CompactArticleRow key={article.id} article={article} />
                   ))}
                 </div>

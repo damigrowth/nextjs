@@ -50,20 +50,20 @@ export default async function ArticlesPage({
   const recentArticles = currentPage === 1 ? remainingArticles.slice(6) : [];
 
   return (
-    <div className="py-16 md:py-24 bg-white">
+    <div className="py-20 bg-white">
       <div className="max-w-5xl mx-auto px-4 lg:px-6">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-3">
+        <div className="mt-4 mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
             Άρθρα
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Οδηγοί, συμβουλές και νέα για επαγγελματίες
           </p>
         </div>
 
         {/* Category Tabs */}
-        <div className="mb-10">
+        <div className="mb-8">
           <BlogCategoryTabs categories={categories} />
         </div>
 
@@ -98,9 +98,12 @@ export default async function ArticlesPage({
             {/* Compact Recent List (page 1 only) */}
             {currentPage === 1 && recentArticles.length > 0 && (
               <div className="mt-12">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  Πρόσφατα Άρθρα
-                </h2>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-muted-foreground">•</span>
+                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Πρόσφατα
+                  </h2>
+                </div>
                 <div>
                   {recentArticles.map((article) => (
                     <CompactArticleRow key={article.id} article={article} />

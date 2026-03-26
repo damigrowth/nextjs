@@ -16,37 +16,42 @@ export default function BlogCategoryTabs({
   currentSlug,
 }: BlogCategoryTabsProps) {
   return (
-    <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-      <div className="flex items-center gap-2 min-w-max">
-        {/* All articles tab */}
-        <Link
-          href="/articles"
-          className={cn(
-            'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
-            !currentSlug
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-          )}
-        >
-          Όλα
-        </Link>
-
-        {/* Category tabs */}
-        {categories.map((category) => (
+    <div className="relative">
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-2 min-w-max pr-24">
+          {/* All articles tab */}
           <Link
-            key={category.slug}
-            href={`/articles/${category.slug}`}
+            href="/articles"
             className={cn(
               'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
-              currentSlug === category.slug
+              !currentSlug
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
             )}
           >
-            {category.label}
+            Όλα
           </Link>
-        ))}
+
+          {/* Category tabs */}
+          {categories.map((category) => (
+            <Link
+              key={category.slug}
+              href={`/articles/${category.slug}`}
+              className={cn(
+                'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
+                currentSlug === category.slug
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+              )}
+            >
+              {category.label}
+            </Link>
+          ))}
+        </div>
       </div>
+
+      {/* Fade gradient overlay */}
+      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white via-white/60 to-transparent pointer-events-none" />
     </div>
   );
 }

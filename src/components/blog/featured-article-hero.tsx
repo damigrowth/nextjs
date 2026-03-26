@@ -40,65 +40,71 @@ export default function FeaturedArticleHero({
 
   return (
     <NextLink href={href} className="group block">
-      <div className="rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden bg-white grid grid-cols-1 md:grid-cols-2">
-        {/* Image */}
-        <div className="relative aspect-[4/3] md:aspect-square overflow-hidden bg-gray-100">
+      <div className="rounded-xl overflow-hidden border border-gray-200 bg-white grid grid-cols-1 md:grid-cols-2">
+        {/* Image — left half */}
+        <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[320px] overflow-hidden bg-gray-100">
           {coverUrl ? (
             <Image
               src={coverUrl}
               alt={article.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 768px) 100vw, 55vw"
+              sizes="(max-width: 768px) 100vw, 50vw"
               priority
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-              No image
-            </div>
+            <div className="absolute inset-0 bg-gray-200" />
           )}
         </div>
 
-        {/* Content */}
-        <div className="p-6 md:p-8 lg:p-10 flex flex-col justify-center">
-          <div className="flex items-center gap-3 mb-4">
-            {category && (
-              <Badge variant="secondary" className="font-medium">
-                {category.label}
-              </Badge>
-            )}
-            {publishedDate && (
-              <span className="text-sm text-muted-foreground">
-                {publishedDate}
-              </span>
-            )}
-          </div>
+        {/* Content — right half */}
+        <div className="p-6 md:p-8 flex flex-col justify-center">
+          <Badge variant="outline" className="w-fit mb-4 text-xs font-medium">
+            ☆ Featured
+          </Badge>
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 group-hover:text-primary transition-colors mb-3 line-clamp-3">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors mb-3 line-clamp-3">
             {article.title}
           </h2>
 
           {article.excerpt && (
-            <p className="text-muted-foreground leading-relaxed line-clamp-3 mb-6">
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-6">
               {article.excerpt}
             </p>
           )}
 
-          {firstAuthor && (
-            <div className="flex items-center gap-2 mt-auto">
-              <UserAvatar
-                displayName={firstAuthor.displayName || undefined}
-                image={firstAuthor.image}
-                size="sm"
-                className="h-8 w-8"
-                showBorder={false}
-                showShadow={false}
-              />
-              <span className="text-sm text-muted-foreground">
-                {firstAuthor.displayName}
-              </span>
+          <div className="flex items-center justify-between mt-auto">
+            <div className="flex items-center gap-3">
+              {firstAuthor && (
+                <>
+                  <UserAvatar
+                    displayName={firstAuthor.displayName || undefined}
+                    image={firstAuthor.image}
+                    size="sm"
+                    className="h-9 w-9"
+                    showBorder={false}
+                    showShadow={false}
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-gray-900 block">
+                      {firstAuthor.displayName}
+                    </span>
+                    {publishedDate && (
+                      <span className="text-xs text-muted-foreground">
+                        {publishedDate}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
-          )}
+
+            {category && (
+              <Badge variant="secondary" className="text-xs font-semibold">
+                {category.label}
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
     </NextLink>

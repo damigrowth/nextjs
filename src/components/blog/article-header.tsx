@@ -42,7 +42,7 @@ export default function ArticleHeader({ article }: ArticleHeaderProps) {
   return (
     <header className="mb-8">
       {/* Meta line */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-6">
         {category && (
           <Badge variant="secondary" className="font-medium">
             {category.label}
@@ -57,20 +57,20 @@ export default function ArticleHeader({ article }: ArticleHeaderProps) {
       </div>
 
       {/* Title */}
-      <h1 className="text-4xl md:text-5xl font-medium text-gray-900 leading-tight mb-4">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-4">
         {article.title}
       </h1>
 
       {/* Excerpt */}
       {article.excerpt && (
-        <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8">
+        <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8">
           {article.excerpt}
         </p>
       )}
 
       {/* Cover Image */}
       {coverUrl && (
-        <div className="relative aspect-[11/4] overflow-hidden rounded-[20px] bg-gray-100">
+        <div className="relative aspect-[2/1] overflow-hidden rounded-[20px] bg-gray-100">
           <Image
             src={coverUrl}
             alt={article.title}

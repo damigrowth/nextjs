@@ -5,17 +5,17 @@ import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
 import type { BlogArticleCard } from '@/lib/types/blog';
 
-interface ArticleCardProps {
+interface HorizontalArticleCardProps {
   article: BlogArticleCard;
 }
 
-export default function ArticleCard({ article }: ArticleCardProps) {
+export default function HorizontalArticleCard({
+  article,
+}: HorizontalArticleCardProps) {
   const category = article.categorySlug
     ? getBlogCategoryBySlug(article.categorySlug)
     : null;
   const href = `/articles/${article.categorySlug || 'uncategorized'}/${article.slug}`;
-
-  const firstAuthor = article.authors[0]?.profile;
 
   const publishedDate = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString('el-GR', {
@@ -35,44 +35,42 @@ export default function ArticleCard({ article }: ArticleCardProps) {
     : null;
 
   return (
-    <Link href={href} className="group block h-full">
-      <div className="h-full">
-        {/* Image */}
-        <div className="relative aspect-[5/3] overflow-hidden rounded-xl bg-gray-100">
+    <Link href={href} className="group block">
+      <div className="flex gap-6 py-6 border-b border-gray-100 last:border-b-0">
+        {/* Text left */}
+        <div className="flex-1 flex flex-col justify-center min-w-0">
+          {category && (
+            <Badge variant="secondary" className="w-fit mb-2 text-xs font-medium">
+              {category.label}
+            </Badge>
+          )}
+          {publishedDate && (
+            <span className="text-xs text-muted-foreground mb-2">
+              {publishedDate}
+            </span>
+          )}
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-primary transition-colors mb-2 line-clamp-2">
+            {article.title}
+          </h3>
+          {article.excerpt && (
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {article.excerpt}
+            </p>
+          )}
+        </div>
+
+        {/* Image right */}
+        <div className="shrink-0 w-[180px] sm:w-[240px] aspect-[3/2] relative rounded-xl overflow-hidden bg-gray-100">
           {coverUrl ? (
             <Image
               src={coverUrl}
               alt={article.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="240px"
             />
           ) : (
             <div className="w-full h-full bg-gray-200" />
-          )}
-        </div>
-
-        {/* Title */}
-        <h3 className="font-bold text-base leading-tight text-gray-900 group-hover:text-primary transition-colors mt-3 mb-2 line-clamp-2">
-          {article.title}
-        </h3>
-
-        {/* Meta row: badge + author + date */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {category && (
-            <Badge variant="secondary" className="text-xs font-semibold">
-              {category.label}
-            </Badge>
-          )}
-          {firstAuthor && (
-            <span className="text-xs text-muted-foreground">
-              {firstAuthor.displayName}
-            </span>
-          )}
-          {publishedDate && (
-            <span className="text-xs text-muted-foreground">
-              {publishedDate}
-            </span>
           )}
         </div>
       </div>

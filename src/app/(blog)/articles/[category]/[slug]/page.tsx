@@ -93,7 +93,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       />
       <div className="max-w-5xl mx-auto px-4 lg:px-6">
         {/* Breadcrumb */}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto mb-6">
           <DynamicBreadcrumb
             segments={[
               { label: 'Άρθρα', href: '/articles' },
@@ -116,7 +116,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </div>
 
         {/* Content + TOC layout */}
-        <div className="mt-12">
+        <div className="mt-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-16">
             {/* Main Content */}
             <div className="max-w-[660px]">

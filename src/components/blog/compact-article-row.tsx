@@ -31,7 +31,7 @@ export default function CompactArticleRow({
       href={href}
       className="group flex items-center justify-between gap-4 py-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 transition-colors px-2 -mx-2 rounded-lg"
     >
-      <h3 className="font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-1 flex-1 min-w-0">
+      <h3 className="text-sm sm:text-base font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-1 flex-1 min-w-0">
         {article.title}
       </h3>
 
@@ -49,9 +49,9 @@ export default function CompactArticleRow({
         )}
 
         {category && (
-          <Badge variant="secondary" className="hidden sm:inline-flex text-xs">
+          <span className="hidden sm:inline text-xs font-semibold text-primary uppercase tracking-wide">
             {category.label}
-          </Badge>
+          </span>
         )}
       </div>
     </NextLink>
