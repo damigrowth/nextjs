@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getArticle } from '@/actions/blog/get-article';
+import { getRelatedArticles } from '@/actions/blog/get-articles';
 import {
   ArticleHeader,
   ArticleContent,
   ArticleToc,
   AuthorBox,
+  RelatedArticles,
 } from '@/components/blog';
+import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
+import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
 import { ArticleSchema } from '@/lib/seo/schema/article-schema';
 
 export const dynamicParams = true;
@@ -64,9 +68,19 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   const article = result.data;
+  const categoryData = article.categorySlug
+    ? getBlogCategoryBySlug(article.categorySlug)
+    : null;
+
+  // Fetch related articles
+  const relatedResult = article.categorySlug
+    ? await getRelatedArticles(article.categorySlug, article.slug, 4)
+    : null;
+  const relatedArticles =
+    relatedResult?.success && relatedResult.data ? relatedResult.data : [];
 
   return (
-    <div className="py-20 bg-white">
+    <div className="py-16 md:py-24 bg-white">
       <ArticleSchema
         slug={article.slug}
         categorySlug={category}
@@ -77,17 +91,35 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         updatedAt={article.updatedAt}
         authors={article.authors.map((a) => a.profile)}
       />
-      <div className="container mx-auto px-4 lg:px-10">
+      <div className="max-w-5xl mx-auto px-4 lg:px-6">
+        {/* Breadcrumb */}
+        <div className="max-w-4xl mx-auto">
+          <DynamicBreadcrumb
+            segments={[
+              { label: 'Άρθρα', href: '/articles' },
+              ...(categoryData
+                ? [
+                    {
+                      label: categoryData.label,
+                      href: `/articles/${category}`,
+                    },
+                  ]
+                : []),
+              { label: article.title, isCurrentPage: true },
+            ]}
+          />
+        </div>
+
         {/* Article Header */}
         <div className="max-w-4xl mx-auto">
           <ArticleHeader article={article} />
         </div>
 
         {/* Content + TOC layout */}
-        <div className="max-w-6xl mx-auto mt-12">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-12">
+        <div className="mt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-16">
             {/* Main Content */}
-            <div className="max-w-3xl">
+            <div className="max-w-[660px]">
               {article.content && (
                 <ArticleContent content={article.content} />
               )}
@@ -112,6 +144,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </div>
 
+        {/* Related Articles */}
+        {relatedArticles.length > 0 && (
+          <div>
+            <RelatedArticles
+              articles={relatedArticles}
+              categoryLabel={categoryData?.label || 'Άρθρα'}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

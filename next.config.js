@@ -4,6 +4,9 @@ const nextConfig = {
   // TODO: Re-enable after implementing useRef pattern for channel persistence
   reactStrictMode: false,
 
+  // Allow dev server access from local network devices
+  allowedDevOrigins: ['192.168.1.231', '*.local'],
+
   // Performance optimizations
   poweredByHeader: false, // Remove X-Powered-By header for security
   generateEtags: true, // Enable ETags for better caching

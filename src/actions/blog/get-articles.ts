@@ -7,7 +7,7 @@ import { ArticleCacheKeys } from '@/lib/cache/keys';
 import { CACHE_TAGS } from '@/lib/cache';
 import type { ActionResult } from '@/lib/types/api';
 import type { BlogArticleQuery } from '@/lib/validations/blog';
-import type { BlogArticlesResponse } from '@/lib/types/blog';
+import type { BlogArticleCard, BlogArticlesResponse } from '@/lib/types/blog';
 
 /**
  * Select fields for article cards (archive pages)
@@ -61,6 +61,10 @@ async function _getArticles(
       where.authors = {
         some: { profileId: params.authorProfileId },
       };
+    }
+
+    if (params?.featured !== undefined) {
+      where.featured = params.featured;
     }
 
     if (params?.search) {
@@ -123,4 +127,55 @@ export async function getArticles(
   );
 
   return getCached(params);
+}
+
+/**
+ * Uncached: fetch related articles in the same category
+ */
+async function _getRelatedArticles(
+  categorySlug: string,
+  excludeSlug: string,
+  limit: number,
+): Promise<BlogArticleCard[]> {
+  const articles = await prisma.blogArticle.findMany({
+    where: {
+      status: 'published',
+      categorySlug,
+      slug: { not: excludeSlug },
+    },
+    select: ARTICLE_CARD_SELECT,
+    orderBy: { publishedAt: 'desc' },
+    take: limit,
+  });
+
+  return articles;
+}
+
+/**
+ * Cached: get related articles for article detail page
+ */
+export async function getRelatedArticles(
+  categorySlug: string,
+  excludeSlug: string,
+  limit = 4,
+): Promise<ActionResult<BlogArticleCard[]>> {
+  try {
+    const getCached = unstable_cache(
+      _getRelatedArticles,
+      ArticleCacheKeys.related({ categorySlug, excludeSlug }),
+      {
+        tags: [
+          CACHE_TAGS.article.byCategory(categorySlug),
+          CACHE_TAGS.blog.articles,
+        ],
+        revalidate: getCacheTTL('ARTICLE_ARCHIVE'),
+      },
+    );
+
+    const articles = await getCached(categorySlug, excludeSlug, limit);
+    return { success: true, data: articles };
+  } catch (error) {
+    console.error('Error fetching related articles:', error);
+    return { success: false, error: 'Failed to fetch related articles' };
+  }
 }

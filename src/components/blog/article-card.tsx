@@ -41,7 +41,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
     <Link href={href} className="group block h-full">
       <Card className="overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 rounded-2xl bg-white h-full flex flex-col">
         {/* Cover Image */}
-        <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-gray-100">
+        <div className="relative aspect-[5/3] overflow-hidden rounded-t-2xl bg-gray-100">
           {coverUrl ? (
             <Image
               src={coverUrl}

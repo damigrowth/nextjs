@@ -57,7 +57,7 @@ export default function ArticleHeader({ article }: ArticleHeaderProps) {
       </div>
 
       {/* Title */}
-      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4">
+      <h1 className="text-4xl md:text-5xl font-medium text-gray-900 leading-tight mb-4">
         {article.title}
       </h1>
 
@@ -70,7 +70,7 @@ export default function ArticleHeader({ article }: ArticleHeaderProps) {
 
       {/* Cover Image */}
       {coverUrl && (
-        <div className="relative aspect-[2/1] overflow-hidden rounded-2xl bg-gray-100">
+        <div className="relative aspect-[11/4] overflow-hidden rounded-[20px] bg-gray-100">
           <Image
             src={coverUrl}
             alt={article.title}

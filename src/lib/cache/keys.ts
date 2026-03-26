@@ -302,6 +302,15 @@ export const ArticleCacheKeys = {
     page?: number;
     limit?: number;
   }) => buildCacheKey('articles', params),
+
+  /**
+   * Related articles for article detail page
+   */
+  related: (params: { categorySlug: string; excludeSlug: string }) =>
+    buildCacheKey('articles', {
+      related: params.categorySlug,
+      exclude: params.excludeSlug,
+    }),
 };
 
 // ============================================================================
