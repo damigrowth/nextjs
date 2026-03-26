@@ -104,7 +104,7 @@ async function _getArticles(
 export async function getArticles(
   params?: Partial<BlogArticleQuery>,
 ): Promise<ActionResult<BlogArticlesResponse>> {
-  const tags = [CACHE_TAGS.blog.articles];
+  const tags: string[] = [CACHE_TAGS.blog.articles];
   if (params?.categorySlug) {
     tags.push(CACHE_TAGS.article.byCategory(params.categorySlug));
   }
