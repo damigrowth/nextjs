@@ -7,8 +7,8 @@ import {
   ArticleToc,
   AuthorBox,
 } from '@/components/blog';
+import { ArticleSchema } from '@/lib/seo/schema/article-schema';
 
-export const revalidate = 300;
 export const dynamicParams = true;
 
 interface ArticlePageProps {
@@ -56,7 +56,7 @@ export async function generateMetadata({
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { slug } = await params;
+  const { category, slug } = await params;
   const result = await getArticle(slug);
 
   if (!result.success || !result.data) {
@@ -67,6 +67,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <div className="py-20 bg-white">
+      <ArticleSchema
+        slug={article.slug}
+        categorySlug={category}
+        title={article.title}
+        excerpt={article.excerpt}
+        coverImage={article.coverImage}
+        publishedAt={article.publishedAt}
+        updatedAt={article.updatedAt}
+        authors={article.authors.map((a) => a.profile)}
+      />
       <div className="container mx-auto px-4 lg:px-10">
         {/* Article Header */}
         <div className="max-w-4xl mx-auto">

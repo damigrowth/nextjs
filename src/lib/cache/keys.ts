@@ -271,6 +271,40 @@ export const DirectoryCacheKeys = {
 };
 
 // ============================================================================
+// ARTICLE CACHE KEYS
+// ============================================================================
+
+export const ArticleCacheKeys = {
+  /**
+   * Article detail page (by slug)
+   *
+   * @param slug - Article slug
+   * @returns Cache key for article detail
+   *
+   * @example
+   * ArticleCacheKeys.detail('my-article-slug')
+   * // Returns: ['article', 'slug:my-article-slug']
+   */
+  detail: (slug: string) => buildCacheKey('article', { slug }),
+
+  /**
+   * Article archive (filtered list)
+   *
+   * @param params - Filter parameters
+   * @returns Hierarchical cache key array
+   *
+   * @example
+   * ArticleCacheKeys.archive({ categorySlug: 'tips', page: 2, limit: 12 })
+   * // Returns: ['articles', 'categorySlug:tips', 'limit:12', 'page:2']
+   */
+  archive: (params: {
+    categorySlug?: string;
+    page?: number;
+    limit?: number;
+  }) => buildCacheKey('articles', params),
+};
+
+// ============================================================================
 // HOME PAGE CACHE KEYS
 // ============================================================================
 

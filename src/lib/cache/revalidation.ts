@@ -283,6 +283,12 @@ export async function revalidateArticle(params: {
   revalidateTag(CACHE_TAGS.blog.articles);
 
   // Paths
+  if (slug && categorySlug) {
+    revalidatePath(`/articles/${categorySlug}/${slug}`);
+  }
+  if (categorySlug) {
+    revalidatePath(`/articles/${categorySlug}`);
+  }
   revalidatePath('/articles');
 }
 

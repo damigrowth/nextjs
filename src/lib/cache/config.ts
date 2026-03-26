@@ -166,6 +166,38 @@ export const CACHE_TTL = {
   PROFILE_PAGE: 1800,
 
   // ============================================================================
+  // BLOG PAGES
+  // ============================================================================
+
+  /**
+   * Article detail page
+   *
+   * Change Frequency: Article updates (admin edits)
+   * Invalidation: Tag-based on article slug and ID
+   * TTL: 30 minutes (1800s)
+   *
+   * Why 30m?
+   * - Same rationale as SERVICE_PAGE
+   * - Articles update occasionally (admin edits)
+   * - Tag invalidation handles immediate updates
+   */
+  ARTICLE_PAGE: 1800,
+
+  /**
+   * Article archives (main blog + category filtered)
+   *
+   * Change Frequency: New articles published
+   * Invalidation: Tag-based on blog collection + category
+   * TTL: 1 hour (3600s)
+   *
+   * Why 1h?
+   * - Same rationale as SERVICE_ARCHIVE
+   * - New articles added periodically
+   * - Tag invalidation handles critical updates
+   */
+  ARTICLE_ARCHIVE: 3600,
+
+  // ============================================================================
   // DYNAMIC DATA (Frequently Changing)
   // ============================================================================
 

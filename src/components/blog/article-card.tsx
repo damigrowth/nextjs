@@ -5,26 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import UserAvatar from '@/components/shared/user-avatar';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
+import type { BlogArticleCard } from '@/lib/types/blog';
 
 interface ArticleCardProps {
-  article: {
-    id: number;
-    slug: string;
-    title: string;
-    excerpt: string | null;
-    coverImage: any;
-    categorySlug: string | null;
-    publishedAt: Date | string | null;
-    authors: Array<{
-      order: number;
-      profile: {
-        id: number;
-        username: string | null;
-        displayName: string | null;
-        image: any;
-      };
-    }>;
-  };
+  article: BlogArticleCard;
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {

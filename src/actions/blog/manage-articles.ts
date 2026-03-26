@@ -7,7 +7,9 @@ import { getAdminSessionWithPermission } from '@/actions/admin/helpers';
 import { createArticleSchema, updateArticleSchema } from '@/lib/validations/blog';
 import { createSlug } from '@/lib/utils/text/slug';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
 import type { ActionResult } from '@/lib/types/api';
+import type { BlogArticleAdmin } from '@/lib/types/blog';
 import type { CreateArticleInput, UpdateArticleInput } from '@/lib/validations/blog';
 
 /**
@@ -20,6 +22,24 @@ export async function createArticle(
     await getAdminSessionWithPermission(ADMIN_RESOURCES.BLOG, 'edit');
 
     const validated = createArticleSchema.parse(input);
+
+    // Validate categorySlug exists in static categories
+    if (validated.categorySlug && !getBlogCategoryBySlug(validated.categorySlug)) {
+      return { success: false, error: `Invalid category: ${validated.categorySlug}` };
+    }
+
+    // Validate author profiles exist
+    if (validated.authorProfileIds?.length) {
+      const existingProfiles = await prisma.profile.findMany({
+        where: { id: { in: validated.authorProfileIds } },
+        select: { id: true },
+      });
+      const existingIds = new Set(existingProfiles.map((p) => p.id));
+      const missing = validated.authorProfileIds.filter((id) => !existingIds.has(id));
+      if (missing.length > 0) {
+        return { success: false, error: `Author profiles not found: ${missing.join(', ')}` };
+      }
+    }
 
     // Use provided slug or generate from title + timestamp suffix
     const slug = validated.slug || `${createSlug(validated.title)}-${Date.now().toString(36)}`;
@@ -80,6 +100,24 @@ export async function updateArticle(
 
     const validated = updateArticleSchema.parse(input);
     const { id, authorProfileIds, ...updateData } = validated;
+
+    // Validate categorySlug if provided
+    if (updateData.categorySlug && !getBlogCategoryBySlug(updateData.categorySlug)) {
+      return { success: false, error: `Invalid category: ${updateData.categorySlug}` };
+    }
+
+    // Validate author profiles if provided
+    if (authorProfileIds?.length) {
+      const existingProfiles = await prisma.profile.findMany({
+        where: { id: { in: authorProfileIds } },
+        select: { id: true },
+      });
+      const existingIds = new Set(existingProfiles.map((p) => p.id));
+      const missing = authorProfileIds.filter((id) => !existingIds.has(id));
+      if (missing.length > 0) {
+        return { success: false, error: `Author profiles not found: ${missing.join(', ')}` };
+      }
+    }
 
     // Build update data
     const data: any = {};
@@ -201,7 +239,7 @@ export async function listArticlesAdmin(params?: {
   search?: string;
 }): Promise<
   ActionResult<{
-    articles: any[];
+    articles: BlogArticleAdmin[];
     total: number;
     totalPages: number;
   }>
@@ -234,11 +272,14 @@ export async function listArticlesAdmin(params?: {
         include: {
           authors: {
             select: {
+              profileId: true,
+              order: true,
               profile: {
                 select: {
                   id: true,
                   displayName: true,
                   image: true,
+                  username: true,
                 },
               },
             },
@@ -271,7 +312,7 @@ export async function listArticlesAdmin(params?: {
  */
 export async function getArticleAdmin(
   id: string,
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<BlogArticleAdmin>> {
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.BLOG, 'view');
 

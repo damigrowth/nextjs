@@ -1,20 +1,30 @@
+import { Suspense } from 'react';
 import { SiteHeader } from '@/components/admin/site-header';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { NextLink } from '@/components';
 import { requirePermission } from '@/actions/auth/server';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
-import { listArticlesAdmin } from '@/actions/blog/manage-articles';
-import { AdminArticlesDataTable } from '@/components/admin/admin-articles-data-table';
+import { AdminArticlesFilters } from '@/components/admin/admin-articles-filters';
+import { AdminArticlesTableSection } from '@/components/admin/admin-articles-table-section';
+import { AdminArticlesTableSkeleton } from '@/components/admin/admin-articles-table-skeleton';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ArticlesPage() {
+interface ArticlesPageProps {
+  searchParams: Promise<{
+    page?: string;
+    status?: string;
+    category?: string;
+    search?: string;
+  }>;
+}
+
+export default async function ArticlesPage({
+  searchParams,
+}: ArticlesPageProps) {
   await requirePermission(ADMIN_RESOURCES.BLOG, '/admin');
-
-  const result = await listArticlesAdmin({ limit: 50 });
-
-  const articles = result.success && result.data ? result.data.articles : [];
+  const params = await searchParams;
 
   return (
     <>
@@ -31,13 +41,15 @@ export default async function ArticlesPage() {
       />
       <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
         <div className='px-4 lg:px-6'>
-          {!result.success ? (
-            <div className='text-destructive'>
-              Σφάλμα: {result.error || 'Αποτυχία φόρτωσης άρθρων'}
-            </div>
-          ) : (
-            <AdminArticlesDataTable data={articles} />
-          )}
+          <div className='space-y-6'>
+            <AdminArticlesFilters />
+            <Suspense
+              key={JSON.stringify(params)}
+              fallback={<AdminArticlesTableSkeleton />}
+            >
+              <AdminArticlesTableSection searchParams={params} />
+            </Suspense>
+          </div>
         </div>
       </div>
     </>

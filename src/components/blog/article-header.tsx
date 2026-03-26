@@ -3,16 +3,10 @@ import { Badge } from '@/components/ui/badge';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 import { stripHtmlTags } from '@/lib/utils/text/html';
 import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
+import type { BlogArticleDetail } from '@/lib/types/blog';
 
 interface ArticleHeaderProps {
-  article: {
-    title: string;
-    excerpt: string | null;
-    content: string | null;
-    coverImage: any;
-    categorySlug: string | null;
-    publishedAt: Date | string | null;
-  };
+  article: Pick<BlogArticleDetail, 'title' | 'excerpt' | 'content' | 'coverImage' | 'categorySlug' | 'publishedAt'>;
 }
 
 function estimateReadTime(content: string | null): number {

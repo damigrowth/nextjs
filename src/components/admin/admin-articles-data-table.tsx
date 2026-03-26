@@ -19,25 +19,9 @@ import {
 } from '@/components/ui/tooltip';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
 import { NextLink } from '@/components';
+import UserAvatar from '../shared/user-avatar';
 import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
-
-interface ArticleRow {
-  id: string;
-  title: string;
-  slug: string;
-  categorySlug: string | null;
-  status: string;
-  featured: boolean;
-  publishedAt: string | null;
-  createdAt: string;
-  authors: {
-    profile: {
-      id: string;
-      displayName: string | null;
-      image: string | null;
-    };
-  }[];
-}
+import type { BlogArticleAdmin } from '@/lib/types/blog';
 
 function ArticleStatusBadges({
   status,
@@ -93,7 +77,7 @@ function ArticleStatusBadges({
 }
 
 interface AdminArticlesDataTableProps {
-  data: ArticleRow[];
+  data: BlogArticleAdmin[];
   loading?: boolean;
   basePath?: string;
 }
@@ -103,7 +87,7 @@ export function AdminArticlesDataTable({
   loading = false,
   basePath = '/admin/articles',
 }: AdminArticlesDataTableProps) {
-  const columns: ColumnDef<ArticleRow>[] = [
+  const columns: ColumnDef<BlogArticleAdmin>[] = [
     {
       key: 'title',
       header: 'Τίτλος',
@@ -118,16 +102,38 @@ export function AdminArticlesDataTable({
               {article.title}
             </h3>
           </NextLink>
-          {article.authors?.length > 0 && (
-            <p className='text-xs text-muted-foreground'>
-              {article.authors
-                .map((a) => a.profile?.displayName)
-                .filter(Boolean)
-                .join(', ')}
-            </p>
-          )}
         </div>
       ),
+    },
+    {
+      key: 'authors',
+      header: 'Συντάκτης',
+      render: (article) =>
+        article.authors?.length > 0 ? (
+          <div className='flex flex-col gap-2'>
+            {article.authors.map((a) => (
+              <NextLink
+                key={a.profileId}
+                href={`/admin/profiles/${a.profile.id}`}
+                className='flex items-center gap-2 hover:text-primary transition-colors'
+              >
+                <UserAvatar
+                  displayName={a.profile.displayName || undefined}
+                  image={a.profile.image}
+                  size='sm'
+                  className='h-7 w-7'
+                  showBorder={false}
+                  showShadow={false}
+                />
+                <span className='text-sm hover:underline'>
+                  {a.profile.displayName || 'Unknown'}
+                </span>
+              </NextLink>
+            ))}
+          </div>
+        ) : (
+          <span className='text-muted-foreground'>-</span>
+        ),
     },
     {
       key: 'categorySlug',

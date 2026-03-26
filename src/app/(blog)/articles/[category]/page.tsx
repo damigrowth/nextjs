@@ -39,7 +39,7 @@ export async function generateMetadata({
 
   return {
     title: `${category.label} - Άρθρα | Doulitsa`,
-    description: category.description || `Άρθρα στην κατηγορία ${category.label}`,
+    description: category.description || `Διαβάστε άρθρα στην κατηγορία ${category.label}`,
   };
 }
 
@@ -78,7 +78,7 @@ export default async function CategoryPage({
             {category.label}
           </h1>
           <p className="text-muted-foreground">
-            Άρθρα στην κατηγορία {category.label}
+            {category.description || `Άρθρα στην κατηγορία ${category.label}`}
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export default async function CategoryPage({
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {articles.map((article: any) => (
+              {articles.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}
             </div>

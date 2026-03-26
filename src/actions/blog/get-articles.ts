@@ -1,8 +1,13 @@
 'use server';
 
+import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
+import { getCacheTTL } from '@/lib/cache/config';
+import { ArticleCacheKeys } from '@/lib/cache/keys';
+import { CACHE_TAGS } from '@/lib/cache';
 import type { ActionResult } from '@/lib/types/api';
 import type { BlogArticleQuery } from '@/lib/validations/blog';
+import type { BlogArticlesResponse } from '@/lib/types/blog';
 
 /**
  * Select fields for article cards (archive pages)
@@ -34,18 +39,11 @@ const ARTICLE_CARD_SELECT = {
 } as const;
 
 /**
- * Get paginated articles for public archive pages
+ * Uncached: fetch paginated published articles
  */
-export async function getArticles(
+async function _getArticles(
   params?: Partial<BlogArticleQuery>,
-): Promise<
-  ActionResult<{
-    articles: any[];
-    total: number;
-    totalPages: number;
-    hasMore: boolean;
-  }>
-> {
+): Promise<ActionResult<BlogArticlesResponse>> {
   try {
     const page = params?.page || 1;
     const limit = params?.limit || 12;
@@ -98,4 +96,31 @@ export async function getArticles(
     console.error('Error fetching articles:', error);
     return { success: false, error: 'Failed to fetch articles' };
   }
+}
+
+/**
+ * Cached: get paginated articles for public archive pages
+ */
+export async function getArticles(
+  params?: Partial<BlogArticleQuery>,
+): Promise<ActionResult<BlogArticlesResponse>> {
+  const tags = [CACHE_TAGS.blog.articles];
+  if (params?.categorySlug) {
+    tags.push(CACHE_TAGS.article.byCategory(params.categorySlug));
+  }
+
+  const getCached = unstable_cache(
+    _getArticles,
+    ArticleCacheKeys.archive({
+      categorySlug: params?.categorySlug,
+      page: params?.page,
+      limit: params?.limit,
+    }),
+    {
+      tags,
+      revalidate: getCacheTTL('ARTICLE_ARCHIVE'),
+    },
+  );
+
+  return getCached(params);
 }

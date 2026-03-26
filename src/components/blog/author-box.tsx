@@ -1,19 +1,9 @@
 import Link from 'next/link';
 import UserAvatar from '@/components/shared/user-avatar';
-
-interface Author {
-  order: number;
-  profile: {
-    id: number;
-    username: string | null;
-    displayName: string | null;
-    image: any;
-    authorBio: string | null;
-  };
-}
+import type { BlogArticleDetailAuthor } from '@/lib/types/blog';
 
 interface AuthorBoxProps {
-  authors: Author[];
+  authors: BlogArticleDetailAuthor[];
 }
 
 export default function AuthorBox({ authors }: AuthorBoxProps) {
