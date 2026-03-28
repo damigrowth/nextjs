@@ -1,6 +1,9 @@
 'use server';
 
 import { Meta } from './meta';
+import { MetaData } from './metadata';
+import { prisma } from '@/lib/prisma/client';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 
 /**
  * Service page metadata generation
@@ -502,5 +505,85 @@ export async function getCompanySubcategoryMetadata(
     size: 200,
     url: `/dir/${categorySlug}/${subcategorySlug}?type=companies`,
   });
+  return meta;
+}
+
+// ============================================================================
+// BLOG METADATA
+// ============================================================================
+
+/**
+ * Blog archive page metadata
+ */
+export async function getBlogArchiveMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: 'Άρθρα | Doulitsa',
+    descriptionTemplate:
+      'Διάβασε χρήσιμα άρθρα και συμβουλές από επαγγελματίες σε όλη την Ελλάδα.',
+    size: 160,
+    url: '/articles',
+  });
+
+  return meta;
+}
+
+/**
+ * Blog category page metadata
+ */
+export async function getBlogCategoryMetadata(categorySlug: string) {
+  const { getBlogCategoryBySlug } = await import('@/constants/datasets/blog-categories');
+  const category = getBlogCategoryBySlug(categorySlug);
+
+  const label = category?.label || categorySlug;
+  const description =
+    category?.description ||
+    `Άρθρα στην κατηγορία ${label} από επαγγελματίες στη Doulitsa.`;
+
+  const { meta } = await Meta({
+    titleTemplate: `${label} - Άρθρα | Doulitsa`,
+    descriptionTemplate: description,
+    size: 160,
+    url: `/articles/${categorySlug}`,
+  });
+
+  return meta;
+}
+
+/**
+ * Blog article detail page metadata
+ */
+export async function getArticleMetadata(slug: string) {
+  const article = await prisma.blogArticle.findUnique({
+    where: { slug },
+    select: {
+      title: true,
+      excerpt: true,
+      content: true,
+      coverImage: true,
+      categorySlug: true,
+    },
+  });
+
+  if (!article) {
+    return null;
+  }
+
+  const description =
+    article.excerpt || stripHtmlTags(article.content).slice(0, 160);
+
+  // Extract URL from CloudinaryResource JSON or string
+  const coverUrl =
+    article.coverImage && typeof article.coverImage === 'object'
+      ? (article.coverImage as any).secure_url
+      : article.coverImage;
+
+  const { meta } = await MetaData({
+    title: `${article.title} | Doulitsa`,
+    description,
+    size: 160,
+    image: coverUrl || undefined,
+    url: `/articles/${article.categorySlug || 'uncategorized'}/${slug}`,
+  });
+
   return meta;
 }

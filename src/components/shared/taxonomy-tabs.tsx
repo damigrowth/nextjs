@@ -1,7 +1,7 @@
 import React from 'react';
 import NextLink from './next-link';
 
-// Static service categories for navbar - links to /categories/{slug}
+// Default service categories (used when no items prop is passed)
 const SERVICE_CATEGORIES = [
   { id: '1', label: 'Δημιουργία Περιεχομένου', slug: 'dimiourgia-periexomenou', emoji: '🎥' },
   { id: '2', label: 'Εκδηλώσεις', slug: 'ekdiloseis', emoji: '🎶' },
@@ -13,18 +13,41 @@ const SERVICE_CATEGORIES = [
   { id: '8', label: 'Υποστήριξη', slug: 'ypostiriksi', emoji: '🤝' },
 ];
 
+interface TaxonomyTabItem {
+  label: string;
+  slug: string;
+  emoji?: string;
+}
+
 interface TaxonomyTabsProps {
+  /** Category items to display. Defaults to SERVICE_CATEGORIES. */
+  items?: TaxonomyTabItem[];
+  /** Base path for category links. Defaults to '/categories'. */
+  basePath?: string;
+  /** Label for the "all" tab. Defaults to 'Όλες οι Κατηγορίες'. */
+  allItemsLabel?: string;
+  /** Href for the "all" tab. Defaults to basePath. */
+  allItemsHref?: string;
+  /** Currently active category slug. */
   activeItemSlug?: string;
   className?: string;
 }
 
 /**
- * Static navbar with service categories linking to /categories/{slug}
+ * Reusable horizontal taxonomy/category navigation tabs.
+ * Works for service categories, blog categories, or any taxonomy.
  */
 export default function TaxonomyTabs({
+  items,
+  basePath = '/categories',
+  allItemsLabel = 'Όλες οι Κατηγορίες',
+  allItemsHref,
   activeItemSlug,
   className = '',
 }: TaxonomyTabsProps) {
+  const categories = items || SERVICE_CATEGORIES;
+  const allHref = allItemsHref || basePath;
+
   return (
     <section className={`overflow-hidden bg-muted border-b border-gray-200 ${className}`}>
       <div className='container mx-auto p-2'>
@@ -35,20 +58,20 @@ export default function TaxonomyTabs({
                 {/* All categories link */}
                 <li className='flex-shrink-0'>
                   <NextLink
-                    href='/categories'
+                    href={allHref}
                     className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
                       !activeItemSlug ? 'text-primary font-medium' : ''
                     }`}
                   >
-                    Όλες οι Κατηγορίες
+                    {allItemsLabel}
                   </NextLink>
                 </li>
 
                 {/* Category links */}
-                {SERVICE_CATEGORIES.map((category) => (
-                  <li key={category.id} className='flex-shrink-0'>
+                {categories.map((category) => (
+                  <li key={category.slug} className='flex-shrink-0'>
                     <NextLink
-                      href={`/categories/${category.slug}`}
+                      href={`${basePath}/${category.slug}`}
                       className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
                         activeItemSlug === category.slug ? 'text-primary font-medium' : ''
                       }`}

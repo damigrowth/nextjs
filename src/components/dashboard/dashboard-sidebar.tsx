@@ -198,6 +198,25 @@ export default function DashboardSidebar({
           </SidebarGroup>
         )}
 
+        {/* Blog Articles */}
+        <SidebarGroup>
+          <SidebarGroupLabel className='uppercase'>Άρθρα</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                tooltip='Τα Άρθρα μου'
+                isActive={pathname.startsWith('/dashboard/articles')}
+              >
+                <NextLink href='/dashboard/articles'>
+                  <FileText />
+                  <span>Τα Άρθρα μου</span>
+                </NextLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
         {/* Group 3: Account Management */}
         <SidebarGroup>
           <SidebarGroupLabel className='uppercase'>Λογαριασμός</SidebarGroupLabel>

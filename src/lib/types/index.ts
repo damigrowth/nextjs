@@ -12,3 +12,4 @@ export * from './email';
 export * from './services';
 export * from './saved';
 export * from './reviews';
+export * from './blog';

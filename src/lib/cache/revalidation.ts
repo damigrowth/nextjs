@@ -246,6 +246,53 @@ export async function revalidateReview(params: {
 }
 
 /**
+ * Invalidate all caches related to a blog article mutation
+ * Use this for: create, update, delete, publish/unpublish
+ *
+ * @example
+ * await revalidateArticle({
+ *   articleId: article.id,
+ *   slug: article.slug,
+ *   categorySlug: article.categorySlug,
+ *   authorProfileIds: ['profileId1', 'profileId2'],
+ * });
+ */
+export async function revalidateArticle(params: {
+  articleId: string;
+  slug?: string | null;
+  categorySlug?: string | null;
+  authorProfileIds?: string[];
+}) {
+  const { articleId, slug, categorySlug, authorProfileIds = [] } = params;
+
+  // Article-specific tags
+  revalidateTag(CACHE_TAGS.article.byId(articleId));
+  if (slug) {
+    revalidateTag(CACHE_TAGS.article.bySlug(slug));
+  }
+  if (categorySlug) {
+    revalidateTag(CACHE_TAGS.article.byCategory(categorySlug));
+  }
+
+  // Author tags
+  for (const profileId of authorProfileIds) {
+    revalidateTag(CACHE_TAGS.article.byAuthor(profileId));
+  }
+
+  // Collection tags
+  revalidateTag(CACHE_TAGS.blog.articles);
+
+  // Paths
+  if (slug && categorySlug) {
+    revalidatePath(`/articles/${categorySlug}/${slug}`);
+  }
+  if (categorySlug) {
+    revalidatePath(`/articles/${categorySlug}`);
+  }
+  revalidatePath('/articles');
+}
+
+/**
  * Log cache revalidation for monitoring (development/production)
  */
 export function logCacheRevalidation(

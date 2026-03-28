@@ -6,6 +6,7 @@ export { default as ProfileFeatures } from './profile-features';
 export { default as ProfilePortfolio } from './profile-portfolio';
 export { default as ProfileServices } from './profile-services';
 export { default as ProfileTerms } from './profile-terms';
+
 export { default as ProfileInfo } from './profile-info';
 export { default as ProfileSkills } from './profile-skills';
 export { default as ProfileBreadcrumb } from './profile-breadcrumb';

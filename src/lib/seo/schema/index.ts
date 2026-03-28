@@ -11,3 +11,4 @@ export { ProfileSchema } from './profile-schema';
 export { ProfilesSchema } from './profiles-schema';
 export { CategoriesSchema } from './categories-schema';
 export { DirectorySchema } from './directory-schema';
+export { ArticleSchema } from './article-schema';
