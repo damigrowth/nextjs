@@ -38,6 +38,7 @@ import {
 
 // Actions
 import { upgradeToProAccount } from '@/actions/auth/upgrade-to-pro';
+import { formatUsername } from '@/lib/utils/validation/formats';
 
 // Icons
 import { AlertTriangle, Loader2 } from 'lucide-react';
@@ -148,6 +149,9 @@ export default function UpgradeToProForm({
                     placeholder='π.χ. giannis-papadopoulos'
                     autoComplete='off'
                     {...field}
+                    onChange={(e) => {
+                      field.onChange(formatUsername(e.target.value));
+                    }}
                   />
                 </FormControl>
                 <FormDescription>
