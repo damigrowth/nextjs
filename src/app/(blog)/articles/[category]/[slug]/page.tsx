@@ -93,7 +93,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       />
 
       {/* Hero section — wider container for image */}
-      <div className="px-5 sm:px-10 lg:px-16 pt-12 sm:pt-16">
+      <div className="px-5 sm:px-10 lg:px-16 pt-10">
         {/* Breadcrumb */}
         <div className="max-w-[872px] mx-auto mb-8">
           <DynamicBreadcrumb

@@ -65,14 +65,7 @@ export default async function ArticlesPage({
       />
 
       {/* Content — max 872px like Framer, with horizontal padding */}
-      <div className="max-w-[872px] mx-auto px-5 sm:px-10 lg:px-0">
-        {/* Hero section with top padding */}
-        <div className="pt-12 sm:pt-16">
-          {/* Heading */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-gray-900 -tracking-[0.03em] leading-[110%] mb-10 sm:mb-12">
-            Άρθρα
-          </h1>
-
+      <div className="max-w-[872px] mx-auto px-5 sm:px-10 lg:px-0 pt-10">
           {/* Articles */}
           {allArticles.length === 0 ? (
             <div className="text-center py-16">
@@ -100,7 +93,6 @@ export default async function ArticlesPage({
               )}
             </div>
           )}
-        </div>
 
         {/* "Others" compact list section — 64px top padding like Framer */}
         {currentPage === 1 && recentArticles.length > 0 && (

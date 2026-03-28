@@ -40,10 +40,10 @@ export default function FeaturedArticleHero({
 
   return (
     <NextLink href={href} className="group block">
-      {/* Card: 424px height, 20px radius, white, horizontal 50/50 split */}
-      <div className="flex rounded-[20px] overflow-hidden bg-white h-[320px] md:h-[424px]">
-        {/* Image — left 50% */}
-        <div className="relative w-1/2 overflow-hidden bg-gray-100">
+      {/* Card: vertical on mobile (fit-content), horizontal 50/50 on md+. 16px radius mobile, 20px desktop */}
+      <div className="flex flex-col md:flex-row rounded-2xl md:rounded-[20px] overflow-hidden bg-white md:h-[424px]">
+        {/* Image — full width on mobile (240px tall), left 50% on desktop */}
+        <div className="relative h-[240px] md:h-auto md:w-1/2 overflow-hidden bg-gray-100">
           {coverUrl ? (
             <Image
               src={coverUrl}
@@ -58,8 +58,8 @@ export default function FeaturedArticleHero({
           )}
         </div>
 
-        {/* Content — right 50%, space-between, 36px padding */}
-        <div className="w-1/2 flex flex-col justify-between p-6 md:p-9">
+        {/* Content — full width on mobile, right 50% on desktop, space-between, 36px padding */}
+        <div className="md:w-1/2 flex flex-col justify-between p-6 md:p-9">
           {/* Top: chip + title + description */}
           <div className="flex flex-col gap-5">
             <span className="inline-flex items-center gap-2 w-fit bg-muted rounded-full px-3 py-1.5">

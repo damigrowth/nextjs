@@ -99,7 +99,7 @@ export default async function CategoryPage({
         activeItemSlug={categorySlug}
       />
 
-      <div className="max-w-5xl mx-auto px-4 lg:px-6 py-10">
+      <div className="max-w-[872px] mx-auto px-5 sm:px-10 lg:px-0 pt-10 pb-16">
         {/* Articles */}
         {allArticles.length === 0 ? (
           <div className="text-center py-16">
