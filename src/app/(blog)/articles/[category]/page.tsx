@@ -6,11 +6,11 @@ import {
   getBlogCategoryBySlug,
 } from '@/constants/datasets/blog-categories';
 import {
-  BlogCategoryTabs,
   BlogPagination,
   HorizontalArticleCard,
   CompactArticleRow,
 } from '@/components/blog';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -21,6 +21,7 @@ interface CategoryPageProps {
   }>;
   searchParams: Promise<{
     page?: string;
+    search?: string;
   }>;
 }
 
@@ -49,7 +50,7 @@ export default async function CategoryPage({
   searchParams,
 }: CategoryPageProps) {
   const { category: categorySlug } = await params;
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, search } = await searchParams;
   const currentPage = Math.max(1, parseInt(pageParam || '1'));
 
   const category = getBlogCategoryBySlug(categorySlug);
@@ -63,6 +64,7 @@ export default async function CategoryPage({
     page: currentPage,
     limit: 12,
     categorySlug,
+    ...(search ? { search } : {}),
   });
 
   const allArticles = articlesResult.success
@@ -76,27 +78,28 @@ export default async function CategoryPage({
   const featuredCards = currentPage === 1 ? allArticles.slice(0, 3) : [];
   const compactArticles = currentPage === 1 ? allArticles.slice(3) : allArticles;
 
+  // Fetch "Others" — recent articles from all categories (excluding current category's featured cards)
+  const othersResult = currentPage === 1
+    ? await getArticles({ page: 1, limit: 6 })
+    : null;
+  const otherArticles = othersResult?.success
+    ? othersResult.data!.articles.filter(
+        (a) => !featuredCards.some((f) => f.id === a.id),
+      ).slice(0, 6)
+    : [];
+
   return (
-    <div className="py-20 bg-white">
-      <div className="max-w-5xl mx-auto px-4 lg:px-6">
-        {/* Header */}
-        <div className="mt-4 mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-            {category.label}
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            {category.description || `Άρθρα στην κατηγορία ${category.label}`}
-          </p>
-        </div>
+    <div className="bg-muted min-h-screen pt-20">
+      {/* Category Tabs — full width */}
+      <TaxonomyTabs
+        items={categories.map((c) => ({ label: c.label, slug: c.slug }))}
+        basePath="/articles"
+        allItemsLabel="Όλα"
+        allItemsHref="/articles"
+        activeItemSlug={categorySlug}
+      />
 
-        {/* Category Tabs */}
-        <div className="mb-8">
-          <BlogCategoryTabs
-            categories={categories}
-            currentSlug={categorySlug}
-          />
-        </div>
-
+      <div className="max-w-5xl mx-auto px-4 lg:px-6 py-10">
         {/* Articles */}
         {allArticles.length === 0 ? (
           <div className="text-center py-16">
@@ -120,15 +123,32 @@ export default async function CategoryPage({
 
             {/* Compact List */}
             {compactArticles.length > 0 && (
-              <div className="mt-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-muted-foreground">•</span>
-                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              <div className="mt-16">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                  <h2 className="text-[13px] font-mono font-medium uppercase tracking-normal text-gray-900 leading-none !mb-0">
                     Πρόσφατα
                   </h2>
                 </div>
                 <div>
                   {compactArticles.map((article) => (
+                    <CompactArticleRow key={article.id} article={article} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Others — articles from all categories */}
+            {otherArticles.length > 0 && (
+              <div className="mt-16">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                  <h2 className="text-[13px] font-mono font-medium uppercase tracking-normal text-gray-900 leading-none !mb-0">
+                    Άλλα
+                  </h2>
+                </div>
+                <div>
+                  {otherArticles.map((article) => (
                     <CompactArticleRow key={article.id} article={article} />
                   ))}
                 </div>

@@ -19,6 +19,10 @@ export default function ArticleContent({ content }: ArticleContentProps) {
         [&_strong]:font-semibold [&_strong]:text-gray-900
         [&_em]:italic
         [&>p:first-child]:text-base [&>p:first-child]:sm:text-lg [&>p:first-child]:leading-relaxed [&>p:first-child]:text-gray-800
+        [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:pl-6 [&>blockquote]:py-2 [&>blockquote]:my-8 [&>blockquote]:italic [&>blockquote]:text-gray-600
+        [&>blockquote_p]:text-lg [&>blockquote_p]:leading-relaxed [&>blockquote_p]:mb-2
+        [&>blockquote_cite]:text-sm [&>blockquote_cite]:not-italic [&>blockquote_cite]:font-medium [&>blockquote_cite]:text-gray-900
+        [&_img]:rounded-xl [&_img]:my-6
       "
       dangerouslySetInnerHTML={{ __html: sanitized }}
     />

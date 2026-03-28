@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
 import { NextLink } from '@/components';
+import { Badge } from '@/components/ui/badge';
 import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
 import type { BlogArticleCard } from '@/lib/types/blog';
 
@@ -29,29 +29,32 @@ export default function CompactArticleRow({
   return (
     <NextLink
       href={href}
-      className="group flex items-center justify-between gap-4 py-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 transition-colors px-2 -mx-2 rounded-lg"
+      className="group flex items-center gap-4 py-6 border-b border-black/[0.08] last:border-b-0 transition-colors"
     >
-      <h3 className="text-sm sm:text-base font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-1 flex-1 min-w-0">
+      {/* Title — 3fr */}
+      <h3 className="text-[19px] font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-1 flex-[3] min-w-0 leading-[130%] -tracking-[0.02em]">
         {article.title}
       </h3>
 
-      <div className="flex items-center gap-4 shrink-0">
-        {firstAuthor && (
-          <span className="hidden md:inline text-sm text-muted-foreground">
-            {firstAuthor.displayName}
-          </span>
-        )}
-
-        {publishedDate && (
-          <span className="text-sm text-muted-foreground whitespace-nowrap">
-            {publishedDate}
-          </span>
-        )}
+      {/* Details — 2fr, right side */}
+      <div className="flex items-center justify-between flex-[2] shrink-0">
+        <div className="flex items-center gap-5">
+          {firstAuthor && (
+            <span className="hidden md:inline text-sm font-medium text-gray-900">
+              {firstAuthor.displayName}
+            </span>
+          )}
+          {publishedDate && (
+            <span className="text-[13px] text-muted-foreground uppercase tracking-normal font-mono whitespace-nowrap">
+              {publishedDate}
+            </span>
+          )}
+        </div>
 
         {category && (
-          <span className="hidden sm:inline text-xs font-semibold text-primary uppercase tracking-wide">
+          <Badge variant="default" className="text-xs font-medium rounded-full px-3 py-1">
             {category.label}
-          </span>
+          </Badge>
         )}
       </div>
     </NextLink>

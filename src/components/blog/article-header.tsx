@@ -6,7 +6,7 @@ import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
 import type { BlogArticleDetail } from '@/lib/types/blog';
 
 interface ArticleHeaderProps {
-  article: Pick<BlogArticleDetail, 'title' | 'excerpt' | 'content' | 'coverImage' | 'categorySlug' | 'publishedAt'>;
+  article: Pick<BlogArticleDetail, 'title' | 'content' | 'coverImage' | 'categorySlug' | 'publishedAt' | 'authors'>;
 }
 
 function estimateReadTime(content: string | null): number {
@@ -40,45 +40,44 @@ export default function ArticleHeader({ article }: ArticleHeaderProps) {
     : null;
 
   return (
-    <header className="mb-8">
-      {/* Meta line */}
-      <div className="flex items-center gap-3 mb-6">
+    <header>
+      {/* Content — max 872px, gap 32px */}
+      <div className="max-w-[872px] mx-auto flex flex-col gap-8">
+        {/* Category badge */}
         {category && (
-          <Badge variant="secondary" className="font-medium">
+          <Badge variant="default" className="w-fit text-xs font-medium rounded-full px-3 py-1">
             {category.label}
           </Badge>
         )}
-        {publishedDate && (
-          <span className="text-sm text-muted-foreground">{publishedDate}</span>
-        )}
-        <span className="text-sm text-muted-foreground">
-          {readTime} λεπτά ανάγνωσης
-        </span>
+
+        {/* Title — 57px medium, max 660px */}
+        <h1 className="text-2xl sm:text-4xl md:text-[57px] md:leading-[110%] font-medium text-gray-900 -tracking-[0.03em] max-w-[660px]">
+          {article.title}
+        </h1>
+
+        {/* Details row: read time | divider | published date */}
+        <div className="flex items-center gap-4 text-base font-medium text-gray-900">
+          <span>{readTime} λεπτά ανάγνωσης</span>
+          <span className="w-px h-4 bg-black/[0.08]" />
+          {publishedDate && (
+            <span>Δημοσιεύτηκε {publishedDate}</span>
+          )}
+        </div>
       </div>
 
-      {/* Title */}
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-4">
-        {article.title}
-      </h1>
-
-      {/* Excerpt */}
-      {article.excerpt && (
-        <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8">
-          {article.excerpt}
-        </p>
-      )}
-
-      {/* Cover Image */}
+      {/* Cover Image — full width (max 1320px), 480px height, 20px radius */}
       {coverUrl && (
-        <div className="relative aspect-[2/1] overflow-hidden rounded-[20px] bg-gray-100">
-          <Image
-            src={coverUrl}
-            alt={article.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 1200px"
-            priority
-          />
+        <div className="max-w-[1320px] mx-auto mt-10">
+          <div className="relative h-[280px] sm:h-[380px] md:h-[480px] w-full overflow-hidden rounded-[20px] bg-gray-100">
+            <Image
+              src={coverUrl}
+              alt={article.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 1320px"
+              priority
+            />
+          </div>
         </div>
       )}
     </header>

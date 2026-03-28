@@ -3,11 +3,11 @@ import { notFound } from 'next/navigation';
 import { getArticle } from '@/actions/blog/get-article';
 import { getRelatedArticles } from '@/actions/blog/get-articles';
 import {
+  ArticleCard,
   ArticleHeader,
   ArticleContent,
   ArticleToc,
   AuthorBox,
-  RelatedArticles,
 } from '@/components/blog';
 import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
@@ -80,7 +80,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     relatedResult?.success && relatedResult.data ? relatedResult.data : [];
 
   return (
-    <div className="py-16 md:py-24 bg-white">
+    <div className="bg-muted min-h-screen pt-20">
       <ArticleSchema
         slug={article.slug}
         categorySlug={category}
@@ -91,9 +91,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         updatedAt={article.updatedAt}
         authors={article.authors.map((a) => a.profile)}
       />
-      <div className="max-w-5xl mx-auto px-4 lg:px-6">
+
+      {/* Hero section — wider container for image */}
+      <div className="px-5 sm:px-10 lg:px-16 pt-12 sm:pt-16">
         {/* Breadcrumb */}
-        <div className="max-w-4xl mx-auto mb-6">
+        <div className="max-w-[872px] mx-auto mb-8">
           <DynamicBreadcrumb
             segments={[
               { label: 'Άρθρα', href: '/articles' },
@@ -110,50 +112,55 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           />
         </div>
 
-        {/* Article Header */}
-        <div className="max-w-4xl mx-auto">
-          <ArticleHeader article={article} />
-        </div>
-
-        {/* Content + TOC layout */}
-        <div className="mt-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-16">
-            {/* Main Content */}
-            <div className="max-w-[660px]">
-              {article.content && (
-                <ArticleContent content={article.content} />
-              )}
-
-              {/* Author Box */}
-              {article.authors && article.authors.length > 0 && (
-                <div className="mt-12 pt-8 border-t border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    {article.authors.length === 1
-                      ? 'Συντάκτης'
-                      : 'Συντάκτες'}
-                  </h3>
-                  <AuthorBox authors={article.authors} />
-                </div>
-              )}
-            </div>
-
-            {/* Sidebar TOC */}
-            <aside>
-              {article.content && <ArticleToc content={article.content} />}
-            </aside>
-          </div>
-        </div>
-
-        {/* Related Articles */}
-        {relatedArticles.length > 0 && (
-          <div>
-            <RelatedArticles
-              articles={relatedArticles}
-              categoryLabel={categoryData?.label || 'Άρθρα'}
-            />
-          </div>
-        )}
+        {/* Article Header — category, title, meta, cover image */}
+        <ArticleHeader article={article} />
       </div>
+
+      {/* Article body — 872px max, TOC sidebar + content */}
+      <div className="max-w-[872px] mx-auto px-5 sm:px-10 lg:px-0 py-16">
+        <div className="flex gap-12">
+          {/* TOC sidebar — 180px, sticky */}
+          <aside className="hidden lg:block w-[180px] shrink-0">
+            {article.content && <ArticleToc content={article.content} />}
+          </aside>
+
+          {/* Main content */}
+          <div className="flex-1 min-w-0 flex flex-col gap-12">
+            {article.content && (
+              <ArticleContent content={article.content} />
+            )}
+
+            {/* Author section — divider + author box */}
+            {article.authors && article.authors.length > 0 && (
+              <div className="pt-8 border-t border-black/[0.08]">
+                <AuthorBox authors={article.authors} />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Full-width divider */}
+      <div className="max-w-[872px] mx-auto px-5 sm:px-10 lg:px-0">
+        <div className="h-px bg-black/[0.08]" />
+      </div>
+
+      {/* Related articles — "More" section, 2-col grid */}
+      {relatedArticles.length > 0 && (
+        <div className="max-w-[872px] mx-auto px-5 sm:px-10 lg:px-0 py-16">
+          <div className="flex items-center gap-2 mb-7">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+            <h2 className="text-[13px] font-mono font-medium uppercase tracking-normal text-gray-900 leading-none !mb-0">
+              Περισσότερα από {categoryData?.label || 'Άρθρα'}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {relatedArticles.slice(0, 4).map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -36,9 +36,10 @@ export default function ArticleCard({ article }: ArticleCardProps) {
 
   return (
     <Link href={href} className="group block h-full">
-      <div className="h-full">
-        {/* Image */}
-        <div className="relative aspect-[5/3] overflow-hidden rounded-xl bg-gray-100">
+      {/* Vertical card: image → title → details, 12px gap */}
+      <div className="flex flex-col gap-3 h-full">
+        {/* Image: 160px height, ~5:3 aspect, 12px radius */}
+        <div className="relative h-[160px] w-full rounded-xl overflow-hidden bg-gray-100">
           {coverUrl ? (
             <Image
               src={coverUrl}
@@ -48,29 +49,29 @@ export default function ArticleCard({ article }: ArticleCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full bg-gray-200" />
+            <div className="absolute inset-0 bg-gray-200" />
           )}
         </div>
 
-        {/* Title */}
-        <h3 className="font-bold text-base leading-tight text-gray-900 group-hover:text-primary transition-colors mt-3 mb-2 line-clamp-2">
+        {/* Title: 19px medium */}
+        <h3 className="text-[19px] font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-[130%] -tracking-[0.02em]">
           {article.title}
         </h3>
 
-        {/* Meta row: badge + author + date */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Details row: badge + author + date, 12px gap */}
+        <div className="flex items-center gap-3 flex-wrap">
           {category && (
-            <Badge variant="secondary" className="text-xs font-semibold">
+            <Badge variant="default" className="text-xs font-medium rounded-full px-3 py-1">
               {category.label}
             </Badge>
           )}
           {firstAuthor && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm font-medium text-gray-900">
               {firstAuthor.displayName}
             </span>
           )}
           {publishedDate && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-[13px] text-muted-foreground uppercase tracking-normal font-mono">
               {publishedDate}
             </span>
           )}

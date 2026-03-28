@@ -40,9 +40,10 @@ export default function FeaturedArticleHero({
 
   return (
     <NextLink href={href} className="group block">
-      <div className="rounded-xl overflow-hidden border border-gray-200 bg-white grid grid-cols-1 md:grid-cols-2">
-        {/* Image — left half */}
-        <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[320px] overflow-hidden bg-gray-100">
+      {/* Card: 424px height, 20px radius, white, horizontal 50/50 split */}
+      <div className="flex rounded-[20px] overflow-hidden bg-white h-[320px] md:h-[424px]">
+        {/* Image — left 50% */}
+        <div className="relative w-1/2 overflow-hidden bg-gray-100">
           {coverUrl ? (
             <Image
               src={coverUrl}
@@ -57,23 +58,29 @@ export default function FeaturedArticleHero({
           )}
         </div>
 
-        {/* Content — right half */}
-        <div className="p-6 md:p-8 flex flex-col justify-center">
-          <Badge variant="outline" className="w-fit mb-4 text-xs font-medium">
-            ☆ Featured
-          </Badge>
+        {/* Content — right 50%, space-between, 36px padding */}
+        <div className="w-1/2 flex flex-col justify-between p-6 md:p-9">
+          {/* Top: chip + title + description */}
+          <div className="flex flex-col gap-5">
+            <span className="inline-flex items-center gap-2 w-fit bg-muted rounded-full px-3 py-1.5">
+              <span className="text-[13px] font-mono font-medium uppercase tracking-normal">
+                ☆ Featured
+              </span>
+            </span>
 
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors mb-3 line-clamp-3">
-            {article.title}
-          </h2>
+            <h2 className="text-xl md:text-[33px] md:leading-[120%] font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-3 -tracking-[0.03em]">
+              {article.title}
+            </h2>
 
-          {article.excerpt && (
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-6">
-              {article.excerpt}
-            </p>
-          )}
+            {article.excerpt && (
+              <p className="text-sm md:text-[19px] md:leading-[130%] text-muted-foreground line-clamp-2 -tracking-[0.02em]">
+                {article.excerpt}
+              </p>
+            )}
+          </div>
 
-          <div className="flex items-center justify-between mt-auto">
+          {/* Bottom: author + category */}
+          <div className="flex items-end justify-between">
             <div className="flex items-center gap-3">
               {firstAuthor && (
                 <>
@@ -81,7 +88,7 @@ export default function FeaturedArticleHero({
                     displayName={firstAuthor.displayName || undefined}
                     image={firstAuthor.image}
                     size="sm"
-                    className="h-9 w-9"
+                    className="h-8 w-8"
                     showBorder={false}
                     showShadow={false}
                   />
@@ -90,7 +97,7 @@ export default function FeaturedArticleHero({
                       {firstAuthor.displayName}
                     </span>
                     {publishedDate && (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[13px] font-mono text-muted-foreground uppercase tracking-normal">
                         {publishedDate}
                       </span>
                     )}
@@ -100,7 +107,7 @@ export default function FeaturedArticleHero({
             </div>
 
             {category && (
-              <Badge variant="secondary" className="text-xs font-semibold">
+              <Badge variant="default" className="text-xs font-medium rounded-full px-3 py-1">
                 {category.label}
               </Badge>
             )}

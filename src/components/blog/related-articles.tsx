@@ -17,7 +17,7 @@ export default function RelatedArticles({
       <h2 className="text-2xl font-bold text-gray-900 mb-8">
         Περισσότερα από {categoryLabel}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {articles.map((article) => (
           <ArticleCard key={article.id} article={article} />
         ))}
