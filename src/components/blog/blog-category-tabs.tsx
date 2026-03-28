@@ -1,10 +1,11 @@
 'use client';
 
-import { useRef, useState, useCallback, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Search, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 interface BlogCategory {
   slug: string;
